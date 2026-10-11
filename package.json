@@ -1,0 +1,17 @@
+{
+  "name": "digitorium-studio",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Digitorium Studio: the admin app for digitorium.in",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.3",
+    "next": "^16.4.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  }
+}

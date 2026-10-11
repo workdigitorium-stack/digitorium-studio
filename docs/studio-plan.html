@@ -1,0 +1,296 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Digitorium Studio Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column of plan sections, with a phone + desktop mock of the admin set beside the overview. */
+:root{
+  --bg:#FFFFFF; --bg2:#FFF7F0; --fg:#1A1410; --fg2:#5E5249; --line:#EFE3D8;
+  --o1:#FC8605; --o2:#F45C14; --accent:#E2560F; --chip:#FFF1E6;
+  --ok:#1F8A4C; --okbg:#E7F5EC; --warn:#B26A00; --warnbg:#FFF3DC;
+  --card:#FFFFFF; --shadow:0 18px 40px -28px rgba(110,45,10,.35);
+  --display:"Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15100C; --bg2:#1D1611; --fg:#F5ECE4; --fg2:#BDAEA2; --line:#3A2E25;
+  --accent:#FF8A3D; --chip:#2A1E15; --ok:#5BD08A; --okbg:#173022; --warn:#F2B04B; --warnbg:#33260F;
+  --card:#1E1712; --shadow:0 18px 40px -28px rgba(0,0,0,.7); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15100C; --bg2:#1D1611; --fg:#F5ECE4; --fg2:#BDAEA2; --line:#3A2E25;
+  --accent:#FF8A3D; --chip:#2A1E15; --ok:#5BD08A; --okbg:#173022; --warn:#F2B04B; --warnbg:#33260F;
+  --card:#1E1712; --shadow:0 18px 40px -28px rgba(0,0,0,.7); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:400 15px/1.65 var(--body);-webkit-font-smoothing:antialiased}
+.page{max-width:1080px;margin:0 auto;padding-inline:20px;padding-block:40px 72px;display:grid;gap:56px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;letter-spacing:-.02em}
+h1{font-size:clamp(30px,5.4vw,48px);line-height:1.08;font-weight:700}
+h2{font-size:clamp(22px,3.4vw,28px);line-height:1.15;font-weight:700}
+h3{font-size:16px;font-weight:600;letter-spacing:-.01em}
+p{margin:0}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.lead{font-size:17px;color:var(--fg2);max-width:62ch}
+.muted{color:var(--fg2)}
+code,.mono{font-family:var(--mono);font-size:.86em}
+code{background:var(--chip);padding:1px 6px;border-radius:6px}
+section{display:grid;gap:20px}
+.sechead{display:grid;gap:10px}
+
+/* hero */
+.hero{display:grid;gap:28px;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);align-items:center}
+.hero-copy{display:grid;gap:16px;min-width:0}
+.grad{background:linear-gradient(135deg,var(--o1),var(--o2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.facts{display:flex;flex-wrap:wrap;gap:8px}
+.facts span{font-size:13px;padding:6px 12px;border-radius:999px;background:var(--chip);color:var(--fg)}
+
+/* mockups */
+.mocks{position:relative;min-height:380px;min-width:0}
+.desk{position:absolute;inset:0 60px 40px 0;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;display:grid;grid-template-columns:120px 1fr}
+.desk .side{background:var(--bg2);border-right:1px solid var(--line);padding:14px 10px;display:grid;align-content:start;gap:4px;font-size:11.5px}
+.desk .side b{font-size:12px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.dot{width:14px;height:14px;border-radius:5px;background:linear-gradient(135deg,var(--o1),var(--o2));display:inline-block}
+.desk .side span{padding:5px 8px;border-radius:7px;color:var(--fg2)}
+.desk .side span.on{background:var(--card);color:var(--fg);font-weight:600;box-shadow:0 1px 0 var(--line)}
+.desk .main{padding:14px;display:grid;align-content:start;gap:10px;min-width:0}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px}
+.btn{font:600 11px/1 var(--body);padding:7px 11px;border-radius:999px;background:linear-gradient(135deg,var(--o1),var(--o2));color:#fff;white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.row{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;font-size:11.5px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;min-width:0}
+.row em{font-style:normal;color:var(--fg2);display:block;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{font:500 10px/1 var(--mono);padding:4px 7px;border-radius:999px;white-space:nowrap}
+.pill.live{background:var(--okbg);color:var(--ok)}
+.pill.draft{background:var(--warnbg);color:var(--warn)}
+.pill.new{background:var(--chip);color:var(--accent)}
+.phone{position:absolute;right:0;bottom:0;width:178px;height:330px;background:var(--card);border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);padding:12px 10px 0;display:grid;grid-template-rows:auto 1fr auto;gap:8px;overflow:hidden}
+.phone .top{font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.phone .list{display:grid;align-content:start;gap:6px}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);margin:0 -10px;padding:8px 4px 12px;font-size:9px;text-align:center;color:var(--fg2)}
+.tabs i{display:block;width:16px;height:16px;margin:0 auto 3px;border-radius:5px;background:var(--line)}
+.tabs .on{color:var(--accent);font-weight:600}
+.tabs .on i{background:linear-gradient(135deg,var(--o1),var(--o2))}
+
+/* publish flow */
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;counter-reset:s}
+.step{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:6px;min-width:0}
+.step .n{font:500 12px/1 var(--mono);color:var(--accent)}
+.step p{font-size:13.5px;color:var(--fg2)}
+
+/* modules */
+.mods{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.mod{border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:8px;align-content:start;background:var(--card);min-width:0}
+.mod .tag{font:500 11px/1 var(--mono);color:var(--fg2)}
+.mod ul{margin:0;padding-left:18px;display:grid;gap:3px;font-size:13.5px;color:var(--fg2)}
+.mod.key{background:var(--bg2)}
+
+/* tables */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:13.5px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 11.5px/1.3 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--fg2);background:var(--bg2)}
+tr:last-child td{border-bottom:0}
+td.y{color:var(--ok);font-weight:600}
+td.n{color:var(--fg2)}
+
+/* phases + decisions */
+.phases{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.phase{border-top:3px solid var(--accent);padding-top:12px;display:grid;gap:6px;min-width:0}
+.phase:nth-child(2){border-color:var(--o1)}
+.phase:nth-child(3){border-color:#F0A35E}
+.phase:nth-child(4){border-color:var(--line)}
+.phase ul{margin:0;padding-left:18px;font-size:13.5px;color:var(--fg2);display:grid;gap:2px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+.box{border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:10px;min-width:0}
+.box ul,.box ol{margin:0;padding-left:20px;display:grid;gap:6px;font-size:14px}
+.box li{color:var(--fg)}
+.box li span{color:var(--fg2)}
+footer{font-size:12.5px;color:var(--fg2);border-top:1px solid var(--line);padding-top:16px}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr}
+  .mods{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .flow,.phases{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:560px){
+  .page{gap:44px}
+  .mods,.flow,.phases,.two{grid-template-columns:1fr}
+  .mocks{min-height:360px}
+  .desk{inset:0 40px 70px 0;grid-template-columns:86px 1fr}
+  .desk .side{font-size:10.5px}
+  .phone{width:156px;height:300px}
+}
+@media print{
+  .page{padding-block:0}
+  .mod,.step,.box,.phase{break-inside:avoid}
+}
+</style>
+
+<main class="page">
+
+  <header class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Plan · Content system for digitorium.in</p>
+      <h1>Digitorium <span class="grad">Studio</span></h1>
+      <p class="lead">One admin app where you change everything on digitorium.in, from the logo to every page, photo, video and SEO tag. Press Publish and the live site updates within seconds. Leads from every form land in the same place, and it works on your phone like an app.</p>
+      <div class="facts">
+        <span>Lives at digitorium.in/studio</span>
+        <span>Same Next.js site, no new hosting</span>
+        <span>Supabase for login, data and media</span>
+        <span>Installable on phone</span>
+      </div>
+    </div>
+
+    <div class="mocks" aria-label="Sketch of the admin on desktop and phone">
+      <div class="desk">
+        <div class="side">
+          <b><span class="dot"></span>Studio</b>
+          <span>Dashboard</span>
+          <span class="on">Pages</span>
+          <span>Media</span>
+          <span>Posts</span>
+          <span>Leads</span>
+          <span>SEO</span>
+          <span>Brand</span>
+          <span>Users</span>
+          <span>Settings</span>
+        </div>
+        <div class="main">
+          <div class="bar"><strong>Pages</strong><span class="btn">+ New page</span></div>
+          <div class="row"><div>Home<em>/ · edited 2 min ago by Neel</em></div><span class="pill live">Live</span></div>
+          <div class="row"><div>Services: Ads<em>/services/ads/ · 3 reels</em></div><span class="pill live">Live</span></div>
+          <div class="row"><div>Work: Naarie<em>/work-naarie/ · unsaved changes</em></div><span class="pill draft">Draft</span></div>
+          <div class="row"><div>About<em>/about/ · edited yesterday</em></div><span class="pill live">Live</span></div>
+          <div class="bar"><span class="btn ghost">Preview</span><span class="btn">Publish</span></div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="top">Leads <span class="pill new">3 new</span></div>
+        <div class="list">
+          <div class="row"><div>Riya S.<em>Popup · Home · 10:42</em></div><span class="pill new">New</span></div>
+          <div class="row"><div>Amit P.<em>Contact · Ads · 09:15</em></div><span class="pill new">New</span></div>
+          <div class="row"><div>Kunal M.<em>Discovery form</em></div><span class="pill live">Replied</span></div>
+        </div>
+        <div class="tabs">
+          <span><i></i>Home</span><span><i></i>Pages</span><span><i></i>Media</span><span class="on"><i></i>Leads</span><span><i></i>More</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <div class="sechead">
+      <p class="eyebrow">How publishing works</p>
+      <h2>Edit, check, publish, live</h2>
+      <p class="lead">Every change is saved as a draft first, so nothing half-finished reaches visitors. Publishing refreshes only the pages that use that content.</p>
+    </div>
+    <div class="flow">
+      <div class="step"><span class="n">1 · Edit</span><h3>Change anything</h3><p>Text, images, reels, buttons or SEO in a simple form. Autosaves as a draft.</p></div>
+      <div class="step"><span class="n">2 · Preview</span><h3>See it first</h3><p>Opens the real page with your draft applied, on desktop and phone sizes.</p></div>
+      <div class="step"><span class="n">3 · Publish</span><h3>One button</h3><p>Or schedule a date and time. Every publish is kept as a version.</p></div>
+      <div class="step"><span class="n">4 · Live</span><h3>Within seconds</h3><p>The site refreshes those pages immediately. One click rolls back to any earlier version.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <p class="eyebrow">What's inside</p>
+      <h2>Ten sections in the app</h2>
+    </div>
+    <div class="mods">
+      <div class="mod key"><span class="tag">Pages</span><h3>Every page and section</h3><ul><li>Home, Services, Work, About, Contact, legal pages</li><li>Edit each section: headings, text, buttons, images</li><li>Add, hide or reorder sections</li><li>Create new pages and case studies</li></ul></div>
+      <div class="mod key"><span class="tag">Media</span><h3>Photos and videos</h3><ul><li>Separate Photos and Videos tabs</li><li>Folders by client and site section</li><li>Drag and drop upload, cover image, caption</li><li>Delete removes it from the site everywhere</li></ul></div>
+      <div class="mod key"><span class="tag">Leads</span><h3>All enquiries in one inbox</h3><ul><li>Lead popup, contact form, client discovery form</li><li>Status: New, Contacted, Won, Lost</li><li>Notes, one-tap WhatsApp or call</li><li>Email or push alert on every new lead, CSV export</li></ul></div>
+      <div class="mod"><span class="tag">Brand</span><h3>Logo and look</h3><ul><li>Logo, favicon, brand colours</li><li>Header menu and footer links</li><li>Phone, WhatsApp, email, address, socials</li></ul></div>
+      <div class="mod"><span class="tag">Posts</span><h3>Blog and news</h3><ul><li>Write, format, add images and reels</li><li>Categories and tags</li><li>Draft, schedule, publish</li></ul></div>
+      <div class="mod"><span class="tag">SEO</span><h3>Search settings</h3><ul><li>Title, description, share image per page</li><li>Live Google preview and length checks</li><li>Redirects, sitemap, robots, noindex</li></ul></div>
+      <div class="mod"><span class="tag">Clients</span><h3>Logos and case studies</h3><ul><li>Client logo strip, black and white</li><li>Add a client once, reuse it everywhere</li><li>Link logos to case studies</li></ul></div>
+      <div class="mod"><span class="tag">Users</span><h3>Team access by email invite</h3><ul><li>Invite by email, they set their own password</li><li>Roles: Owner, Admin, Editor, Viewer</li><li>Remove access in one click</li></ul></div>
+      <div class="mod"><span class="tag">Settings</span><h3>Site-wide switches</h3><ul><li>Lead popup timing and text</li><li>Cookie banner, analytics IDs</li><li>Activity log: who changed what, when</li></ul></div>
+    </div>
+    <p class="muted" style="font-size:13.5px">A Dashboard opens the app: new leads today, pages with unpublished drafts, and recent changes.</p>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <p class="eyebrow">Who can do what</p>
+      <h2>Roles for invited users</h2>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Can they…</th><th>Owner</th><th>Admin</th><th>Editor</th><th>Viewer</th></tr></thead>
+        <tbody>
+          <tr><td>Edit pages, posts, media</td><td class="y">Yes</td><td class="y">Yes</td><td class="y">Yes</td><td class="n">No</td></tr>
+          <tr><td>Publish to the live site</td><td class="y">Yes</td><td class="y">Yes</td><td class="n">Asks for approval</td><td class="n">No</td></tr>
+          <tr><td>See and manage leads</td><td class="y">Yes</td><td class="y">Yes</td><td class="n">No</td><td class="y">Read only</td></tr>
+          <tr><td>Change brand, SEO, settings</td><td class="y">Yes</td><td class="y">Yes</td><td class="n">No</td><td class="n">No</td></tr>
+          <tr><td>Invite or remove users</td><td class="y">Yes</td><td class="n">No</td><td class="n">No</td><td class="n">No</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <p class="eyebrow">How it's built</p>
+      <h2>Small additions to what already runs</h2>
+    </div>
+    <div class="two">
+      <div class="box">
+        <h3>Under the hood</h3>
+        <ul>
+          <li><strong>App:</strong> <span>a <code>/studio</code> area inside the same Next.js site, so no new hosting or domain.</span></li>
+          <li><strong>Login and invites:</strong> <span>Supabase Auth, email invite and magic link.</span></li>
+          <li><strong>Content:</strong> <span>Supabase tables for pages, sections, posts, SEO, settings, each with draft and published versions.</span></li>
+          <li><strong>Media:</strong> <span>the existing <code>videos</code> bucket and its folders, plus a photos bucket.</span></li>
+          <li><strong>Going live:</strong> <span>Publish tells Vercel to refresh just the affected pages (on-demand revalidation), so changes show in seconds.</span></li>
+          <li><strong>Phone app:</strong> <span>installable web app (PWA) with a bottom tab bar and lead alerts.</span></li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>Safety</h3>
+        <ul>
+          <li><strong>Row level security</strong> <span>on every table: visitors can only submit forms, never read them.</span></li>
+          <li><strong>Version history</strong> <span>on every page and post, with one-click rollback.</span></li>
+          <li><strong>Activity log</strong> <span>of every publish, delete and invite.</span></li>
+          <li><strong>Studio is private:</strong> <span>hidden from Google, login required on every screen.</span></li>
+          <li><strong>Deleted media</strong> <span>goes to a 30-day bin before it is removed for good.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <p class="eyebrow">Build order</p>
+      <h2>Four phases, each usable on its own</h2>
+    </div>
+    <div class="phases">
+      <div class="phase"><span class="eyebrow">Phase 1</span><h3>Login, leads, media</h3><ul><li>Studio shell, phone layout</li><li>Email invites and roles</li><li>Leads inbox and alerts</li><li>Photo and video library</li></ul></div>
+      <div class="phase"><span class="eyebrow">Phase 2</span><h3>Pages and brand</h3><ul><li>Move page text into the CMS</li><li>Section editor and preview</li><li>Logo, menu, footer, contact</li><li>Publish and rollback</li></ul></div>
+      <div class="phase"><span class="eyebrow">Phase 3</span><h3>SEO and posts</h3><ul><li>Per-page SEO and previews</li><li>Redirects and sitemap</li><li>Blog with scheduling</li></ul></div>
+      <div class="phase"><span class="eyebrow">Phase 4</span><h3>Polish</h3><ul><li>New pages from templates</li><li>Editor approval flow</li><li>Activity log, media bin</li></ul></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <p class="eyebrow">Your call before we build</p>
+      <h2>Decisions to make</h2>
+    </div>
+    <div class="box">
+      <ol>
+        <li>Should the Studio live at <code>digitorium.in/studio</code> or on its own subdomain like <code>studio.digitorium.in</code>?</li>
+        <li>Should Editors publish directly, or always need an Owner or Admin to approve?</li>
+        <li>Where should new-lead alerts go: email, WhatsApp, phone push, or all three?</li>
+        <li>Do you want a blog now, or only pages and case studies to start?</li>
+        <li>Should new pages be built from fixed section blocks (safer layout) or a freer page builder?</li>
+      </ol>
+    </div>
+  </section>
+
+  <footer>Draft plan for Digitorium · prepared October 2026 · nothing in the live site changes until a phase is approved.</footer>
+</main>
+
+</body></html>
