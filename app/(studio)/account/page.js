@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useStudio } from "@/components/StudioProvider";
 import Icon from "@/components/Icon";
 import { supabase, SITE_URL } from "@/lib/supabase";
-import { ROLE_INFO } from "@/lib/roles";
+import { can, ROLE_INFO } from "@/lib/roles";
 
 export default function Account() {
   const { member, email, role, signOut, toast, refreshMember } = useStudio();
@@ -51,6 +51,24 @@ export default function Account() {
 
       <section className="card">
         <div className="list">
+          {can(role, "content.read") ? (
+            <>
+              <Link href="/pages" className="row">
+                <Icon name="pages" size={18} />
+                <div className="grow">
+                  <div className="title">Pages</div>
+                  <div className="sub">Edit the words on the site</div>
+                </div>
+              </Link>
+              <Link href="/brand" className="row">
+                <Icon name="brand" size={18} />
+                <div className="grow">
+                  <div className="title">Brand</div>
+                  <div className="sub">Logo, contact details, menu and footer</div>
+                </div>
+              </Link>
+            </>
+          ) : null}
           <Link href="/users" className="row">
             <Icon name="users" size={18} />
             <div className="grow">

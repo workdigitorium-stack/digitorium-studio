@@ -289,3 +289,29 @@ button.row:first-child { border-top: 0; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* ---------- content editor (Pages, Brand) ---------- */
+.statusline { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-top: -8px; }
+.sect > summary { list-style: none; display: flex; align-items: center; gap: 10px; cursor: pointer; margin: -2px 0; }
+.sect > summary::-webkit-details-marker { display: none; }
+.sect > summary::after { content: ""; margin-left: auto; width: 8px; height: 8px; border-right: 1.6px solid var(--slate); border-bottom: 1.6px solid var(--slate); transform: rotate(45deg); transition: transform 0.15s; }
+.sect[open] > summary::after { transform: rotate(-135deg); }
+.sect:not([open]) { gap: 0; }
+.check { display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; }
+.check input { width: 18px; height: 18px; accent-color: var(--o); }
+.fielderr { color: var(--bad); }
+.items { display: grid; gap: 8px; }
+.items > .btn { justify-self: start; }
+.item { border: 1px solid var(--line); border-radius: 12px; background: var(--bg2); }
+.item > summary { list-style: none; display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 14px; cursor: pointer; font-size: 14px; font-weight: 500; min-height: 48px; }
+.item > summary::-webkit-details-marker { display: none; }
+.item > summary .grow { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item[open] > summary { border-bottom: 1px solid var(--line); }
+.item > .formgrid { padding: 14px; background: #fff; border-radius: 0 0 12px 12px; }
+.item .item { background: #fff; }
+.itemtools { display: flex; gap: 4px; flex: none; }
+.imgfield { display: flex; gap: 12px; align-items: flex-start; }
+.imgfield .grow { flex: 1; min-width: 0; display: grid; gap: 8px; }
+.imgthumb { width: 72px; height: 72px; flex: none; border-radius: 10px; border: 1px solid var(--line); background: var(--line2) repeating-conic-gradient(#f4eee8 0 25%, #fff 0 50%) 0 0 / 14px 14px; display: grid; place-items: center; overflow: hidden; color: var(--faint); }
+.imgthumb img { width: 100%; height: 100%; object-fit: contain; }
+.imgthumb svg { width: 24px; height: 24px; }

@@ -1,17 +1,33 @@
 # Digitorium Studio
 
 The admin app for [digitorium.in](https://digitorium.in). The full plan is in
-[`docs/studio-plan.html`](docs/studio-plan.html). This repo holds **phase 1**:
+[`docs/studio-plan.html`](docs/studio-plan.html). This repo holds **phase 1** and
+the first part of **phase 2** (Pages → Home, and Brand):
 
 | Screen | What it does |
 |---|---|
 | Dashboard | Leads waiting for a reply, today and last 7 days, recent uploads, activity log |
 | Leads | One inbox for the lead popup, contact form and client discovery form. Status (New, Contacted, Won, Lost), notes, one-tap call / WhatsApp / email, CSV export. New leads appear live while the Studio is open, with an optional device alert. |
 | Media | The site's photo and video library (`videos/<client>/<section>/<file>` in Supabase). Upload, rename, add a cover to a video, delete to a 30-day bin, restore. Changes show on the site within a minute. |
+| Pages → Home | Every word on the home page, section by section. Hide a section, add, remove and reorder clients, case studies, industries and questions. |
+| Brand | Logo, phone, WhatsApp and email, the header's Services and Work menus, and the footer. Shows on every page. |
 | Team | Invite by email with Owner, Admin, Editor or Viewer roles. Change roles, remove people. |
 | Account | Set a password, sign out, install on phone. |
 
-Pages, Brand, SEO and Posts are phases 2 to 4 and show as "Soon" in the menu.
+The other pages (Services, Work, About, Contact) follow on the same system. SEO and Posts are
+phases 3 and 4 and show as "Soon" in the menu.
+
+## Publishing site text
+
+- Every change in Pages or Brand **autosaves as a draft** (`public.site_content.draft`). Visitors do not see drafts.
+- **Preview** opens the real page on digitorium.in with the draft showing, for the person who clicked it only.
+  The site checks their Studio sign-in (`app/api/draft` in the website repo).
+- **Publish** (owners and admins) copies the draft live and keeps a copy in `site_content_versions`.
+  The site refreshes straight away (`app/api/revalidate` in the website repo), or within a minute if that call fails.
+- **History** lists every publish. **Restore** puts an earlier one back live.
+- The website keeps today's text in `app/content/defaults.json`, so a field nobody has saved still shows it.
+- What each form contains is described in [`lib/content.js`](lib/content.js). Pictures and illustrations that
+  are built into a section (the "What we do" cards, the step drawings) stay in the website's code; their text is editable.
 
 ## How it works
 
@@ -29,6 +45,8 @@ Pages, Brand, SEO and Posts are phases 2 to 4 and show as "Soon" in the menu.
 | | Owner | Admin | Editor | Viewer |
 |---|---|---|---|---|
 | Upload and edit media | Yes | Yes | Yes | No |
+| Edit pages (saved as a draft) | Yes | Yes | Yes | No |
+| Edit brand, publish, restore | Yes | Yes | No | No |
 | See and manage leads | Yes | Yes | No | Read only |
 | Empty the media bin | Yes | Yes | No | No |
 | Invite or remove people | Yes | No | No | No |

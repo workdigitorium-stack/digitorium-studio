@@ -15,14 +15,14 @@ const NAV = [
   { href: "/", label: "Dashboard", icon: "home" },
   { href: "/leads", label: "Leads", icon: "leads", need: "leads.read" },
   { href: "/media", label: "Media", icon: "media", need: "media.read" },
+  { href: "/pages", label: "Pages", icon: "pages", need: "content.read" },
+  { href: "/brand", label: "Brand", icon: "brand", need: "content.read" },
   { href: "/users", label: "Team", icon: "users" },
   { href: "/account", label: "Account", icon: "account" },
 ];
 
 /* Later phases of the plan, shown so the team knows what is coming. */
 const SOON = [
-  { label: "Pages", icon: "pages" },
-  { label: "Brand", icon: "brand" },
   { label: "SEO", icon: "seo" },
   { label: "Posts", icon: "posts" },
 ];

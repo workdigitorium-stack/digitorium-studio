@@ -219,6 +219,9 @@ const VERBS = {
   "team.invite": "invited",
   "team.role": "changed the role of",
   "team.remove": "removed",
+  "content.publish": "published",
+  "content.restore": "restored",
+  "content.discard": "discarded the draft of",
 };
 function describe(a) {
   return (VERBS[a.action] || a.action) + " " + (a.target || "");
