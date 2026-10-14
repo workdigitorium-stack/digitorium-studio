@@ -60,6 +60,20 @@ export default function Account() {
                   <div className="sub">Edit the words on the site</div>
                 </div>
               </Link>
+              <Link href="/posts" className="row">
+                <Icon name="posts" size={18} />
+                <div className="grow">
+                  <div className="title">Posts</div>
+                  <div className="sub">The blog</div>
+                </div>
+              </Link>
+              <Link href="/seo" className="row">
+                <Icon name="seo" size={18} />
+                <div className="grow">
+                  <div className="title">SEO</div>
+                  <div className="sub">Google titles, sharing, redirects</div>
+                </div>
+              </Link>
               <Link href="/brand" className="row">
                 <Icon name="brand" size={18} />
                 <div className="grow">

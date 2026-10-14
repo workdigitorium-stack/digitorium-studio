@@ -16,16 +16,15 @@ const NAV = [
   { href: "/leads", label: "Leads", icon: "leads", need: "leads.read" },
   { href: "/media", label: "Media", icon: "media", need: "media.read" },
   { href: "/pages", label: "Pages", icon: "pages", need: "content.read" },
+  { href: "/posts", label: "Posts", icon: "posts", need: "content.read" },
   { href: "/brand", label: "Brand", icon: "brand", need: "content.read" },
+  { href: "/seo", label: "SEO", icon: "seo", need: "content.read" },
   { href: "/users", label: "Team", icon: "users" },
   { href: "/account", label: "Account", icon: "account" },
 ];
 
 /* Later phases of the plan, shown so the team knows what is coming. */
-const SOON = [
-  { label: "SEO", icon: "seo" },
-  { label: "Posts", icon: "posts" },
-];
+const SOON = [];
 
 export default function StudioLayout({ children }) {
   const { status, role, member, email, signOut, toast } = useStudio();
@@ -126,7 +125,7 @@ export default function StudioLayout({ children }) {
               {n.href === "/leads" && newCount > 0 ? <span className="badge">{newCount}</span> : null}
             </Link>
           ))}
-          <div className="navlabel">Coming next</div>
+          {SOON.length ? <div className="navlabel">Coming next</div> : null}
           {SOON.map((n) => (
             <span key={n.label} className="navitem" title="Planned for a later phase">
               <Icon name={n.icon} />

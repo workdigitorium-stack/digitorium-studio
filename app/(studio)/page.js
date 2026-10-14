@@ -222,6 +222,10 @@ const VERBS = {
   "content.publish": "published",
   "content.restore": "restored",
   "content.discard": "discarded the draft of",
+  "post.publish": "published the post",
+  "post.unpublish": "unpublished the post",
+  "post.restore": "restored the post",
+  "post.delete": "deleted the post",
 };
 function describe(a) {
   return (VERBS[a.action] || a.action) + " " + (a.target || "");

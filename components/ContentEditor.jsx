@@ -19,6 +19,7 @@ import {
   uploadSiteImage,
   linkProblem,
   problems,
+  SEO_LIMITS,
   same,
 } from "@/lib/content";
 
@@ -172,7 +173,7 @@ export default function ContentEditor({ def }) {
     <div className="page editor">
       <div className="pagehead">
         <div>
-          <p className="eyebrow">{def.key === "brand" ? "Brand" : def.group ? "Pages · " + def.group : "Pages"}</p>
+          <p className="eyebrow">{def.key === "brand" ? "Brand" : def.key === "seo" ? "Search and sharing" : def.group ? "Pages · " + def.group : "Pages"}</p>
           <h1>{def.title}</h1>
           <p>{def.blurb}</p>
         </div>
@@ -210,7 +211,7 @@ export default function ContentEditor({ def }) {
       ) : null}
       {!canEdit ? (
         <div className="notice">
-          {def.key === "brand" ? "Only an owner or admin can change the brand." : "Your role can read this page but not change it."}
+          {def.key === "brand" ? "Only an owner or admin can change the brand." : def.key === "seo" ? "Only an owner or admin can change SEO." : "Your role can read this page but not change it."}
         </div>
       ) : null}
       {canEdit && !canPublish && !live ? (
@@ -223,6 +224,7 @@ export default function ContentEditor({ def }) {
       ) : null}
 
       {def.slots ? <SlotForm def={def} doc={doc} change={change} readOnly={!canEdit} toast={toast} /> : null}
+      {def.seo ? <SeoForm def={def} doc={doc} change={change} readOnly={!canEdit} toast={toast} /> : null}
 
       {(def.sections || []).map((s, i) => {
         const base = s.key ? [s.key] : [];
@@ -340,6 +342,148 @@ function Slot({ item, value, changed, set, readOnly, toast }) {
   );
 }
 
+/* Studio → SEO. Each page shows what Google and a shared link show now;
+   an empty field keeps the page's own value from its code. */
+function SeoForm({ def, doc, change, readOnly, toast }) {
+  const [query, setQuery] = useState("");
+  const pages = doc.pages || {};
+  const redirects = Array.isArray(doc.redirects) ? doc.redirects : [];
+  const q = query.trim().toLowerCase();
+  const list = def.pages.filter((p) => !q || (p.path + " " + p.title + " " + (pages[p.path]?.title || "")).toLowerCase().includes(q));
+
+  /* set one field; a page with nothing set is removed from the document */
+  const setField = (path, field, value) => {
+    const cur = { ...(pages[path] || {}), [field]: value };
+    for (const k of Object.keys(cur)) if (cur[k] === "" || cur[k] === false || cur[k] == null) delete cur[k];
+    change(["pages", path], Object.keys(cur).length ? cur : undefined);
+  };
+
+  return (
+    <>
+      <div className="slotbar">
+        <div className="search grow">
+          <Icon name="search" />
+          <input className="input" type="search" placeholder="Find a page" value={query} onChange={(e) => setQuery(e.target.value)} />
+        </div>
+      </div>
+
+      <section className="card">
+        <h2>Pages</h2>
+        <p className="small muted">Leave a field empty to keep the page's own text. Google shows about {SEO_LIMITS.title} characters of a title and {SEO_LIMITS.description} of a description.</p>
+        <div className="items">
+          {list.map((p) => {
+            const o = pages[p.path] || {};
+            const set = Object.keys(o).length;
+            return (
+              <details key={p.path} className="item">
+                <summary>
+                  <span className="grow">
+                    <b>{p.path}</b> <span className="muted small">· {o.title || p.title}</span>
+                  </span>
+                  {o.noindex ? <span className="pill pill--warn">Hidden from Google</span> : null}
+                  {set ? <span className="pill pill--new">Changed</span> : null}
+                </summary>
+                <div className="formgrid">
+                  <SeoPreview path={p.path} title={o.title || p.title} description={o.description || p.description} image={o.image || p.image} />
+                  <Counted label="Title in Google" value={o.title || ""} placeholder={p.title} max={SEO_LIMITS.title} readOnly={readOnly} onChange={(v) => setField(p.path, "title", v)} />
+                  <Counted label="Description in Google" value={o.description || ""} placeholder={p.description} max={SEO_LIMITS.description} readOnly={readOnly} long onChange={(v) => setField(p.path, "description", v)} />
+                  <ImageField id={"seo-img-" + p.path} f={{ label: "Picture when shared (1200 × 630 works best)", hint: p.image ? "Empty keeps the page's own picture." : "Empty: no picture." }} value={o.image || ""} set={(v) => setField(p.path, "image", v)} readOnly={readOnly} toast={toast} />
+                  <label className="check">
+                    <input type="checkbox" checked={!!o.noindex} disabled={readOnly} onChange={(e) => setField(p.path, "noindex", e.target.checked)} />
+                    Hide this page from Google (and leave it out of the sitemap)
+                  </label>
+                  <div className="field">
+                    <span>Canonical address (advanced)</span>
+                    <input className="input" value={o.canonical || ""} placeholder={p.path} readOnly={readOnly} onChange={(e) => setField(p.path, "canonical", e.target.value)} />
+                    <span className="tiny muted">Only if this page copies another one: the address Google should rank instead.</span>
+                  </div>
+                </div>
+              </details>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="card">
+        <h2>Redirects</h2>
+        <p className="small muted">
+          Send an old or removed address to a new one, for example after renaming a page, or a short address for a campaign. A redirect only
+          applies to addresses that have no page of their own.
+        </p>
+        <div className="items">
+          {redirects.map((r, i) => (
+            <div key={i} className="redirect">
+              <input className="input" value={r.from || ""} placeholder="/old-address/" readOnly={readOnly} onChange={(e) => change(["redirects", i, "from"], e.target.value)} aria-label="From" />
+              <span className="muted" aria-hidden="true">→</span>
+              <input className="input" value={r.to || ""} placeholder="/new-address/ or https://…" readOnly={readOnly} onChange={(e) => change(["redirects", i, "to"], e.target.value)} aria-label="To" />
+              <select className="select" value={r.permanent === false ? "temp" : "perm"} disabled={readOnly} onChange={(e) => change(["redirects", i, "permanent"], e.target.value === "perm")} aria-label="Kind">
+                <option value="perm">Permanent (moved)</option>
+                <option value="temp">Temporary</option>
+              </select>
+              {!readOnly ? (
+                <button type="button" className="btn btn--sm btn--icon btn--danger" aria-label="Remove" onClick={() => change(["redirects"], redirects.filter((_, j) => j !== i))}>
+                  <Icon name="trash" />
+                </button>
+              ) : null}
+            </div>
+          ))}
+          {!readOnly ? (
+            <button type="button" className="btn btn--sm" onClick={() => change(["redirects"], [...redirects, { from: "", to: "", permanent: true }])}>
+              <Icon name="plus" /> Add redirect
+            </button>
+          ) : null}
+        </div>
+      </section>
+    </>
+  );
+}
+
+export function Counted({ label, value, placeholder, max, long, readOnly, onChange }) {
+  const n = (value || placeholder || "").length;
+  const Tag = long ? "textarea" : "input";
+  return (
+    <div className="field">
+      <span className="slotlabel">
+        {label}
+        <span className={"tiny " + (n > max ? "fielderr" : "muted")}>
+          {n} / {max}
+        </span>
+      </span>
+      <Tag className={long ? "textarea" : "input"} value={value} placeholder={placeholder} readOnly={readOnly} onChange={(e) => onChange(e.target.value)} />
+      {n > max ? <span className="tiny fielderr">Longer than Google usually shows; the end may be cut off.</span> : null}
+    </div>
+  );
+}
+
+/* Roughly how Google and a shared link will show the page. */
+export function SeoPreview({ path, title, description, image }) {
+  const cut = (s, n) => (s && s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s || "");
+  return (
+    <div className="seoprev">
+      <div className="serp">
+        <div className="serp__site">
+          <span className="serp__fav">D</span>
+          <span>
+            <b>Digitorium</b>
+            <br />
+            <span className="muted">https://digitorium.in{path !== "/" ? " › " + path.replace(/^\/|\/$/g, "").split("/").join(" › ") : ""}</span>
+          </span>
+        </div>
+        <div className="serp__title">{cut(title, 62)}</div>
+        <div className="serp__desc">{cut(description, 160)}</div>
+      </div>
+      <div className="share">
+        <div className="share__img">{image ? <img src={image} alt="" /> : <span className="muted small">No picture</span>}</div>
+        <div className="share__text">
+          <span className="tiny muted">DIGITORIUM.IN</span>
+          <b>{cut(title, 70)}</b>
+          <span className="small muted">{cut(description, 110)}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SaveState({ state, live, row }) {
   if (state === "dirty" || state === "saving") return <span className="pill">Saving…</span>;
   if (state === "conflict") return <span className="pill pill--warn">Not saved</span>;
@@ -433,7 +577,7 @@ function Field({ f, value, path, change, readOnly, toast }) {
   );
 }
 
-function ImageField({ id, f, value, set, readOnly, toast }) {
+export function ImageField({ id, f, value, set, readOnly, toast }) {
   const [busy, setBusy] = useState(false);
   const fileRef = useRef(null);
 

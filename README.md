@@ -2,7 +2,7 @@
 
 The admin app for [digitorium.in](https://digitorium.in). The full plan is in
 [`docs/studio-plan.html`](docs/studio-plan.html). This repo holds **phase 1** and
-**phase 2** (every page of the site, and Brand):
+**phase 2** (every page of the site, and Brand) and **phase 3** (SEO and the blog):
 
 | Screen | What it does |
 |---|---|
@@ -12,11 +12,12 @@ The admin app for [digitorium.in](https://digitorium.in). The full plan is in
 | Pages → Home | Every word on the home page, section by section. Hide a section, add, remove and reorder clients, case studies, industries and questions. |
 | Pages → every other page | Services and the six service pages, Work and the six case studies, About, Contact, Privacy Policy, Terms. Every text, picture and link, in page order under its heading, with search, "Only changed" and Reset to original. |
 | Brand | Logo, phone, WhatsApp and email, the header's Services and Work menus, and the footer. Shows on every page. |
+| Posts | The blog at digitorium.in/blog/. Write with a toolbar (headings, bold, lists, links, quotes, pictures), cover, summary, category, tags and per-post SEO. Publish now or schedule a date; unpublish, history and restore, delete. |
+| SEO | For every page: title and description in Google (with a preview and length check), share picture, hide from Google, canonical. Redirects from old addresses. |
 | Team | Invite by email with Owner, Admin, Editor or Viewer roles. Change roles, remove people. |
 | Account | Set a password, sign out, install on phone. |
 
-Page titles and descriptions for search engines (SEO) and Posts are phases 3 and 4 and show as
-"Soon" in the menu. The lead popup, cookie banner and contact form's own labels are not editable yet.
+The lead popup, cookie banner and contact form's own labels are not editable yet.
 
 ## Publishing site text
 
@@ -53,7 +54,8 @@ Page titles and descriptions for search engines (SEO) and Posts are phases 3 and
 |---|---|---|---|---|
 | Upload and edit media | Yes | Yes | Yes | No |
 | Edit pages (saved as a draft) | Yes | Yes | Yes | No |
-| Edit brand, publish, restore | Yes | Yes | No | No |
+| Write blog posts (drafts) | Yes | Yes | Yes | No |
+| Edit brand and SEO, publish, schedule, restore, delete posts | Yes | Yes | No | No |
 | See and manage leads | Yes | Yes | No | Read only |
 | Empty the media bin | Yes | Yes | No | No |
 | Invite or remove people | Yes | No | No | No |
