@@ -35,6 +35,11 @@ const PATHS = {
   link: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
   activity: "M3 12h4l3-8 4 16 3-8h4",
   inbox: "M3 13l3-8h12l3 8v6H3zM3 13h5l1 2h6l1-2h5",
+  eye: "M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
+  history: "M3 12a9 9 0 1 0 3-6.7M3 4v5h5M12 7v5l3 2",
+  up: "M12 19V5M6 11l6-6 6 6",
+  down: "M12 5v14M6 13l6 6 6-6",
+  publish: "M12 15V3M7 8l5-5 5 5M5 21h14",
 };
 
 export default function Icon({ name, size, ...rest }) {
