@@ -2,7 +2,7 @@
 
 The admin app for [digitorium.in](https://digitorium.in). The full plan is in
 [`docs/studio-plan.html`](docs/studio-plan.html). This repo holds **phase 1** and
-the first part of **phase 2** (Pages → Home, and Brand):
+**phase 2** (every page of the site, and Brand):
 
 | Screen | What it does |
 |---|---|
@@ -10,12 +10,13 @@ the first part of **phase 2** (Pages → Home, and Brand):
 | Leads | One inbox for the lead popup, contact form and client discovery form. Status (New, Contacted, Won, Lost), notes, one-tap call / WhatsApp / email, CSV export. New leads appear live while the Studio is open, with an optional device alert. |
 | Media | The site's photo and video library (`videos/<client>/<section>/<file>` in Supabase). Upload, rename, add a cover to a video, delete to a 30-day bin, restore. Changes show on the site within a minute. |
 | Pages → Home | Every word on the home page, section by section. Hide a section, add, remove and reorder clients, case studies, industries and questions. |
+| Pages → every other page | Services and the six service pages, Work and the six case studies, About, Contact, Privacy Policy, Terms. Every text, picture and link, in page order under its heading, with search, "Only changed" and Reset to original. |
 | Brand | Logo, phone, WhatsApp and email, the header's Services and Work menus, and the footer. Shows on every page. |
 | Team | Invite by email with Owner, Admin, Editor or Viewer roles. Change roles, remove people. |
 | Account | Set a password, sign out, install on phone. |
 
-The other pages (Services, Work, About, Contact) follow on the same system. SEO and Posts are
-phases 3 and 4 and show as "Soon" in the menu.
+Page titles and descriptions for search engines (SEO) and Posts are phases 3 and 4 and show as
+"Soon" in the menu. The lead popup, cookie banner and contact form's own labels are not editable yet.
 
 ## Publishing site text
 
@@ -26,7 +27,13 @@ phases 3 and 4 and show as "Soon" in the menu.
   The site refreshes straight away (`app/api/revalidate` in the website repo), or within a minute if that call fails.
 - **History** lists every publish. **Restore** puts an earlier one back live.
 - The website keeps today's text in `app/content/defaults.json`, so a field nobody has saved still shows it.
-- What each form contains is described in [`lib/content.js`](lib/content.js). Pictures and illustrations that
+- Home and Brand are forms described in [`lib/content.js`](lib/content.js). Every other page keeps its text in
+  the website's code: the website's `scripts/content-slots.js` wrapped each text in `t(page, id, original)`, and the
+  Studio document stores only the changed fields as `{ id: "new text" }`. The fields, labels and originals are in
+  [`lib/site-pages/`](lib/site-pages) (one JSON per page). **After changing a page's text in the website's code**,
+  regenerate them: `node scripts/content-slots.js ../digitorium-studio/lib/site-pages` (from the website repo). An id
+  comes from the original text, so a Studio edit to a text whose original is later rewritten in code stops applying.
+- Phone, WhatsApp and email written into those pages follow Brand automatically. Pictures and illustrations that
   are built into a section (the "What we do" cards, the step drawings) stay in the website's code; their text is editable.
 
 ## How it works

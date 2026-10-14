@@ -24,12 +24,14 @@ import {
 
 const SAVE_DELAY = 900;
 
-/* A copy of obj with the value at path (a list of keys and indexes) replaced. */
+/* A copy of obj with the value at path (a list of keys and indexes)
+   replaced, or removed when the value is undefined. */
 function setIn(obj, path, value) {
   if (!path.length) return value;
   const [k, ...rest] = path;
   const copy = Array.isArray(obj) ? [...obj] : { ...(obj || {}) };
-  copy[k] = setIn(copy[k], rest, value);
+  if (!rest.length && value === undefined) delete copy[k];
+  else copy[k] = setIn(copy[k], rest, value);
   return copy;
 }
 
@@ -170,7 +172,7 @@ export default function ContentEditor({ def }) {
     <div className="page editor">
       <div className="pagehead">
         <div>
-          <p className="eyebrow">{def.key === "brand" ? "Brand" : "Pages"}</p>
+          <p className="eyebrow">{def.key === "brand" ? "Brand" : def.group ? "Pages · " + def.group : "Pages"}</p>
           <h1>{def.title}</h1>
           <p>{def.blurb}</p>
         </div>
@@ -220,7 +222,9 @@ export default function ContentEditor({ def }) {
         </div>
       ) : null}
 
-      {def.sections.map((s, i) => {
+      {def.slots ? <SlotForm def={def} doc={doc} change={change} readOnly={!canEdit} toast={toast} /> : null}
+
+      {(def.sections || []).map((s, i) => {
         const base = s.key ? [s.key] : [];
         const value = s.key ? doc[s.key] || {} : doc;
         return (
@@ -242,6 +246,96 @@ export default function ContentEditor({ def }) {
       })}
 
       {history ? <History def={def} canRestore={canPublish} onClose={() => setHistory(false)} onRestored={load} toast={toast} /> : null}
+    </div>
+  );
+}
+
+/* The other pages: every text, picture and link from the page's code, in
+   page order. The document stores only the fields that differ from the
+   original; setting a field back to the original removes it. */
+function SlotForm({ def, doc, change, readOnly, toast }) {
+  const [query, setQuery] = useState("");
+  const [changedOnly, setChangedOnly] = useState(false);
+  const q = query.trim().toLowerCase();
+  const changed = Object.keys(doc || {}).length;
+
+  const set = (item, v) => change([item.id], v === item.value ? undefined : v);
+
+  const sections = def.slots
+    .map((s) => ({
+      ...s,
+      items: s.items.filter((it) => {
+        const v = typeof doc[it.id] === "string" ? doc[it.id] : it.value;
+        if (changedOnly && typeof doc[it.id] !== "string") return false;
+        return !q || v.toLowerCase().includes(q) || it.value.toLowerCase().includes(q) || it.kind.toLowerCase().includes(q);
+      }),
+    }))
+    .filter((s) => s.items.length);
+
+  return (
+    <>
+      <div className="slotbar">
+        <div className="search grow">
+          <Icon name="search" />
+          <input className="input" type="search" placeholder="Find text on this page" value={query} onChange={(e) => setQuery(e.target.value)} />
+        </div>
+        <label className="check small">
+          <input type="checkbox" checked={changedOnly} onChange={(e) => setChangedOnly(e.target.checked)} />
+          Only changed ({changed})
+        </label>
+      </div>
+      {!sections.length ? <div className="empty">Nothing on this page matches.</div> : null}
+      {sections.map((s, i) => {
+        const n = s.items.filter((it) => typeof doc[it.id] === "string").length;
+        return (
+          <details key={i + s.title} className="card sect" open={i === 0 || !!q || changedOnly}>
+            <summary>
+              <h2>{s.title}</h2>
+              {n ? <span className="pill pill--new">{n} changed</span> : null}
+            </summary>
+            <div className="formgrid">
+              {s.items.map((it) => (
+                <Slot key={it.id} item={it} value={typeof doc[it.id] === "string" ? doc[it.id] : it.value} changed={typeof doc[it.id] === "string"} set={(v) => set(it, v)} readOnly={readOnly} toast={toast} />
+              ))}
+            </div>
+          </details>
+        );
+      })}
+    </>
+  );
+}
+
+function Slot({ item, value, changed, set, readOnly, toast }) {
+  const id = "s-" + item.id;
+  const label = (
+    <span className="slotlabel">
+      <label htmlFor={id}>{item.kind}</label>
+      {changed ? <span className="pill pill--new">Changed</span> : null}
+      {changed && !readOnly ? (
+        <button type="button" className="linkbtn" onClick={() => set(item.value)}>
+          Reset to original
+        </button>
+      ) : null}
+    </span>
+  );
+  if (item.image) {
+    return (
+      <div className={"slot" + (changed ? " is-changed" : "")}>
+        <ImageField id={id} f={{ label }} value={value} set={set} readOnly={readOnly} toast={toast} />
+      </div>
+    );
+  }
+  const long = value.length > 90 || item.value.length > 90;
+  const problem = item.link ? linkProblem(value) : null;
+  return (
+    <div className={"field slot" + (changed ? " is-changed" : "")}>
+      {label}
+      {long ? (
+        <textarea id={id} className="textarea" value={value} readOnly={readOnly} onChange={(e) => set(e.target.value)} />
+      ) : (
+        <input id={id} className="input" value={value} readOnly={readOnly} inputMode={item.link ? "url" : undefined} onChange={(e) => set(e.target.value)} />
+      )}
+      {problem ? <span className="tiny fielderr">{problem}</span> : changed ? <span className="tiny muted">Original: {item.value}</span> : null}
     </div>
   );
 }
@@ -362,9 +456,13 @@ function ImageField({ id, f, value, set, readOnly, toast }) {
 
   return (
     <div className="field">
-      <span>
-        <label htmlFor={id}>{f.label}</label>
-      </span>
+      {typeof f.label === "string" ? (
+        <span>
+          <label htmlFor={id}>{f.label}</label>
+        </span>
+      ) : (
+        f.label
+      )}
       <div className="imgfield">
         <div className="imgthumb">{value ? <img src={value} alt="" /> : <Icon name="photo" />}</div>
         <div className="grow">

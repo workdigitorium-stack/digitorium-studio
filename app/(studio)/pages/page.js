@@ -1,12 +1,14 @@
 "use client";
-/* Pages: the site's pages that can be edited here. Home is first; the
-   others follow in the next releases and show as "Soon". */
+/* Pages: every page of digitorium.in that can be edited here. Home has its
+   own form (lib/content.js DOCS.home); the rest list every text, picture
+   and link from the page itself (lib/site-pages). */
 import Link from "next/link";
 import { useStudio } from "@/components/StudioProvider";
 import Icon from "@/components/Icon";
 import { can } from "@/lib/roles";
+import { SITE_PAGES } from "@/lib/content";
 
-const SOON = ["Services (6 pages)", "Work and case studies", "About", "Contact"];
+const GROUPS = ["Services", "Work", "Company", "Legal"];
 
 export default function Pages() {
   const { role } = useStudio();
@@ -17,30 +19,38 @@ export default function Pages() {
         <div>
           <p className="eyebrow">Pages</p>
           <h1>Pages</h1>
-          <p>Change the words on digitorium.in. Edits save as a draft; Publish puts them live.</p>
+          <p>Change the words, pictures and links on digitorium.in. Edits save as a draft; Publish puts them live.</p>
         </div>
       </div>
       <section className="card">
         <div className="list">
-          <Link href="/pages/home" className="row">
-            <Icon name="home" size={18} />
-            <div className="grow">
-              <div className="title">Home</div>
-              <div className="sub">digitorium.in/</div>
-            </div>
-            <Icon name="edit" size={16} />
-          </Link>
-          {SOON.map((s) => (
-            <div key={s} className="row">
-              <Icon name="pages" size={18} className="muted" />
-              <div className="grow">
-                <div className="title muted">{s}</div>
-              </div>
-              <span className="pill pill--soon">Soon</span>
-            </div>
-          ))}
+          <Row href="/pages/home" title="Home" sub="/" icon="home" />
         </div>
       </section>
+      {GROUPS.map((g) => (
+        <section className="card" key={g}>
+          <h2>{g}</h2>
+          <div className="list">
+            {SITE_PAGES.filter((p) => p.group === g).map((p) => (
+              <Row key={p.key} href={"/pages/" + p.key} title={p.title} sub={p.path} icon="pages" />
+            ))}
+          </div>
+        </section>
+      ))}
+      <p className="small muted">The logo, phone, WhatsApp, email, header menu and footer are under Brand.</p>
     </div>
+  );
+}
+
+function Row({ href, title, sub, icon }) {
+  return (
+    <Link href={href} className="row">
+      <Icon name={icon} size={18} />
+      <div className="grow">
+        <div className="title">{title}</div>
+        <div className="sub">{sub}</div>
+      </div>
+      <Icon name="edit" size={16} />
+    </Link>
   );
 }

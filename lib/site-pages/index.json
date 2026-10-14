@@ -1,0 +1,116 @@
+[
+ {
+  "key": "services",
+  "title": "Services",
+  "path": "/services/",
+  "group": "Services"
+ },
+ {
+  "key": "service-web-design-development",
+  "title": "Web design and development",
+  "path": "/services/web-design-development/",
+  "group": "Services"
+ },
+ {
+  "key": "service-custom-software",
+  "title": "Custom software",
+  "path": "/services/custom-software/",
+  "group": "Services"
+ },
+ {
+  "key": "service-ads",
+  "title": "Meta and Google ads",
+  "path": "/services/ads/",
+  "group": "Services"
+ },
+ {
+  "key": "service-seo",
+  "title": "SEO",
+  "path": "/services/seo/",
+  "group": "Services"
+ },
+ {
+  "key": "service-shoots",
+  "title": "Photo and video shoots",
+  "path": "/services/shoots/",
+  "group": "Services"
+ },
+ {
+  "key": "service-branding",
+  "title": "Branding and design",
+  "path": "/services/branding/",
+  "group": "Services"
+ },
+ {
+  "key": "service-shared",
+  "title": "Wording on every service page",
+  "path": "/services/ads/",
+  "group": "Services"
+ },
+ {
+  "key": "work",
+  "title": "Work",
+  "path": "/work/",
+  "group": "Work"
+ },
+ {
+  "key": "work-highmark-realty",
+  "title": "Highmark Realty",
+  "path": "/work-highmark-realty/",
+  "group": "Work"
+ },
+ {
+  "key": "work-devi-logistics",
+  "title": "Devi Logistics",
+  "path": "/work-devi-logistics/",
+  "group": "Work"
+ },
+ {
+  "key": "work-classic-exclusive-pos",
+  "title": "Classic Exclusive POS",
+  "path": "/work-classic-exclusive-pos/",
+  "group": "Work"
+ },
+ {
+  "key": "work-svj-archinterio",
+  "title": "SVJ ArchInterió",
+  "path": "/work-svj-archinterio/",
+  "group": "Work"
+ },
+ {
+  "key": "work-naarie",
+  "title": "Naarie",
+  "path": "/work-naarie/",
+  "group": "Work"
+ },
+ {
+  "key": "work-sociafi-media",
+  "title": "Sociafi Media",
+  "path": "/work-sociafi-media/",
+  "group": "Work"
+ },
+ {
+  "key": "about",
+  "title": "About",
+  "path": "/about/",
+  "group": "Company"
+ },
+ {
+  "key": "contact",
+  "title": "Contact",
+  "path": "/contact/",
+  "group": "Company"
+ },
+ {
+  "key": "privacy-policy",
+  "title": "Privacy Policy",
+  "path": "/privacy-policy/",
+  "group": "Legal"
+ },
+ {
+  "key": "terms-and-conditions",
+  "title": "Terms and conditions",
+  "path": "/terms-and-conditions/",
+  "group": "Legal"
+ }
+]
