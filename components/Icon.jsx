@@ -40,6 +40,9 @@ const PATHS = {
   up: "M12 19V5M6 11l6-6 6 6",
   down: "M12 5v14M6 13l6 6 6-6",
   publish: "M12 15V3M7 8l5-5 5 5M5 21h14",
+  chair: "M7 3h10v8H7zM5 11h14v3H5zM8 14l-1 7M16 14l1 7M12 14v4M8 18h8",
+  star: "M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z",
+  tag: "M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9zM7.5 7.5h.01",
 };
 
 export default function Icon({ name, size, ...rest }) {

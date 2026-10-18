@@ -370,3 +370,23 @@ button.row:first-child { border-top: 0; }
 @media (min-width: 1100px) { .postgrid { grid-template-columns: minmax(0, 1fr) 340px; align-items: start; } .postgrid > aside { position: sticky; top: 24px; } }
 .pill--scheduled { background: var(--infobg); color: var(--info); }
 .postgrid aside .seoprev { grid-template-columns: 1fr; }
+
+/* ---------- client sites (Dipti Enterprise) ---------- */
+.dthumb { width: 48px; height: 48px; flex: none; border-radius: 10px; border: 1px solid var(--line); background: #fff; overflow: hidden; display: grid; place-items: center; color: var(--faint); }
+.dthumb img { width: 100%; height: 100%; object-fit: contain; }
+.dthumb svg { width: 20px; height: 20px; }
+.row.is-off .title, .row.is-off .dthumb { opacity: 0.5; }
+.imgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
+.imgcell { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #fff; display: grid; }
+.imgcell .pic { aspect-ratio: 1; display: grid; place-items: center; background: #fff; position: relative; }
+.imgcell .pic img { width: 100%; height: 100%; object-fit: contain; }
+.imgcell .pic .pill { position: absolute; top: 6px; left: 6px; }
+.imgcell .tools { display: flex; justify-content: space-between; gap: 2px; padding: 4px; border-top: 1px solid var(--line2); }
+.imgcell.is-off .pic img { opacity: 0.4; }
+.adddrop { aspect-ratio: 1; border: 1.5px dashed #e3d3c5; border-radius: 12px; background: var(--bg2); display: grid; place-items: center; align-content: center; gap: 4px; cursor: pointer; color: var(--o-deep); font-size: 13px; font-weight: 500; text-align: center; padding: 8px; }
+.adddrop svg { width: 24px; height: 24px; }
+.adddrop:hover { border-color: var(--o); }
+.savebar { position: sticky; bottom: calc(var(--tabs-h) + 10px + env(safe-area-inset-bottom, 0px)); z-index: 5; display: flex; gap: 8px; justify-content: flex-end; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(10px); box-shadow: var(--shadow); }
+.savebar .grow { flex: 1; min-width: 0; font-size: 13px; color: var(--muted); }
+@media (min-width: 900px) { .savebar { bottom: 16px; } }
+.stars { color: #f5b301; letter-spacing: 1px; }

@@ -2,6 +2,8 @@
 /* Dashboard: today's leads, what still needs a reply, recent changes. */
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { CLIENTS } from "@/lib/clients";
 import { useStudio } from "@/components/StudioProvider";
 import Icon from "@/components/Icon";
 import { supabase, SITE_URL } from "@/lib/supabase";
@@ -11,13 +13,20 @@ import { fetchLibrary, groupItems, clientName } from "@/lib/media";
 import { startOfTodayIST, timeAgo } from "@/lib/format";
 
 export default function Dashboard() {
-  const { role, member, email } = useStudio();
+  const { role, member, email, brandClient } = useStudio();
+  const router = useRouter();
+  /* client logins, and anyone on a client's portal address, start on that client's screens */
+  const goClient = brandClient && CLIENTS[brandClient];
+  useEffect(() => {
+    if (goClient) router.replace(goClient.home);
+  }, [goClient, router]);
   const [leads, setLeads] = useState(null);
   const [media, setMedia] = useState(null);
   const [activity, setActivity] = useState(null);
   const [notif, setNotif] = useState("default");
 
   const load = useCallback(async () => {
+    if (role === "client") return;
     const jobs = [];
     if (can(role, "leads.read")) jobs.push(fetchLeads({ limit: 200 }).then(setLeads, () => setLeads([])));
     if (can(role, "media.read")) jobs.push(fetchLibrary().then((r) => setMedia(groupItems(r.files)), () => setMedia([])));
@@ -40,6 +49,13 @@ export default function Dashboard() {
     window.addEventListener("studio:lead", on);
     return () => window.removeEventListener("studio:lead", on);
   }, [load]);
+
+  if (goClient)
+    return (
+      <div className="empty">
+        <div className="spinner" />
+      </div>
+    );
 
   const today = startOfTodayIST();
   const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();

@@ -34,7 +34,9 @@ function Btn({ icon, label, on, disabled, onClick, text }) {
   );
 }
 
-export default function RichEditor({ value, onChange, readOnly, toast }) {
+/* html: emit HTML instead of JSON (client sites store HTML).
+   noImages: hide the picture button (client logins cannot use the site media bucket). */
+export default function RichEditor({ value, onChange, readOnly, toast, html, noImages }) {
   const fileRef = useRef(null);
   const [busy, setBusy] = useState(false);
   const editor = useEditor({
@@ -50,11 +52,12 @@ export default function RichEditor({ value, onChange, readOnly, toast }) {
       Image.configure({ allowBase64: false }),
     ],
     content: value,
-    onUpdate: ({ editor }) => onChange(editor.getJSON()),
+    onUpdate: ({ editor }) => onChange(html ? editor.getHTML() : editor.getJSON()),
   });
 
   useEffect(() => {
-    if (editor) editor.setEditable(!readOnly);
+    /* false: toggling editable is not an edit, so do not fire onUpdate */
+    if (editor) editor.setEditable(!readOnly, false);
   }, [editor, readOnly]);
 
   if (!editor) return <div className="rte rte--loading" />;
@@ -119,8 +122,12 @@ export default function RichEditor({ value, onChange, readOnly, toast }) {
           <Btn icon="ordered" label="Numbered list" on={editor.isActive("orderedList")} onClick={() => c().toggleOrderedList().run()} />
           <Btn icon="quote" label="Quote" on={editor.isActive("blockquote")} onClick={() => c().toggleBlockquote().run()} />
           <Btn icon="rule" label="Divider" onClick={() => c().setHorizontalRule().run()} />
-          <Btn icon="image" label={busy ? "Uploading…" : "Picture"} disabled={busy} onClick={() => fileRef.current?.click()} />
-          <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" hidden onChange={addImage} />
+          {!noImages ? (
+            <>
+              <Btn icon="image" label={busy ? "Uploading…" : "Picture"} disabled={busy} onClick={() => fileRef.current?.click()} />
+              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" hidden onChange={addImage} />
+            </>
+          ) : null}
           <span className="rte__sep" />
           <Btn icon="undo" label="Undo" disabled={!editor.can().undo()} onClick={() => c().undo().run()} />
           <Btn icon="redo" label="Redo" disabled={!editor.can().redo()} onClick={() => c().redo().run()} />
