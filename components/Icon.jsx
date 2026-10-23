@@ -43,12 +43,42 @@ const PATHS = {
   chair: "M7 3h10v8H7zM5 11h14v3H5zM8 14l-1 7M16 14l1 7M12 14v4M8 18h8",
   star: "M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z",
   tag: "M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9zM7.5 7.5h.01",
+  menu: "M4 7h16M4 12h16M4 17h16",
+  next: "M9 5l7 7-7 7",
+  select: "M4 4h16v16H4zM8 12l3 3 5-6",
+  linkedin: "M4 4h16v16H4zM8 10v6M8 7.5h.01M12 16v-6M12 13a2.5 2.5 0 0 1 5 0v3",
 };
 
-export default function Icon({ name, size, ...rest }) {
+/* Solid versions for the screen you are on (the bottom bar): the outline
+   filled in, with its inner lines cut out in white. */
+const SOLID = {
+  home: ["M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"],
+  leads: ["M4 4h16v12H5.5L4 17.5z", "M8 9h8M8 12h5"],
+  posts: ["M4 20h4L19 9l-4-4L4 16z", "M13.5 6.5l4 4"],
+  media: ["M4 5h16v14H4z", "M4 15l4.5-4.5 4 4 3-3L20 16M15.5 9.5h.01"],
+  photo: ["M4 5h16v14H4z", "M4 15l4.5-4.5 4 4 3-3L20 16"],
+  pages: ["M6 3h9l4 4v14H6z", "M9 13h7M9 17h7"],
+  chair: ["M7 3h10v8H7zM5 11h14v3H5z", null, "M8 14l-1 7M16 14l1 7M12 14v4M8 18h8"],
+  tag: ["M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z", "M7.5 7.5h.01"],
+  star: [PATHS.star],
+  settings: [PATHS.settings, "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"],
+  account: [PATHS.account],
+  menu: [null, null, "M4 7h16M4 12h16M4 17h16"],
+};
+
+export default function Icon({ name, size, solid, ...rest }) {
+  const s = solid && SOLID[name];
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" width={size} height={size} aria-hidden="true" {...rest}>
-      <path d={PATHS[name] || ""} />
+      {s ? (
+        <>
+          {s[0] ? <path d={s[0]} fill="currentColor" /> : null}
+          {s[1] ? <path d={s[1]} stroke="#fff" strokeWidth="1.9" /> : null}
+          {s[2] ? <path d={s[2]} strokeWidth="2.3" /> : null}
+        </>
+      ) : (
+        <path d={PATHS[name] || ""} />
+      )}
     </svg>
   );
 }
