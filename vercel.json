@@ -1,3 +1,4 @@
 {
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "crons": [{ "path": "/api/linkedin/share", "schedule": "30 4 * * *" }]
 }

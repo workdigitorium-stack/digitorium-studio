@@ -8,6 +8,7 @@ import Icon from "@/components/Icon";
 import { supabase, SITE_URL } from "@/lib/supabase";
 import { can, ROLE_INFO } from "@/lib/roles";
 import { CLIENTS } from "@/lib/clients";
+import LinkedInCard from "@/components/LinkedInCard";
 
 export default function Account() {
   const { member, email, role, signOut, toast, refreshMember, client } = useStudio();
@@ -137,6 +138,8 @@ export default function Account() {
           </div>
         </form>
       ) : null}
+
+      {can(role, "content.publish") ? <LinkedInCard /> : null}
 
       <form className="card" onSubmit={savePassword}>
         <div>

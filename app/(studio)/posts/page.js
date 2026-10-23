@@ -8,7 +8,8 @@ import { useStudio } from "@/components/StudioProvider";
 import Icon from "@/components/Icon";
 import { can } from "@/lib/roles";
 import { SITE_URL } from "@/lib/supabase";
-import { createPost, fetchPosts, postStatus } from "@/lib/posts";
+import { createPost, dueForLinkedIn, fetchPosts, postStatus } from "@/lib/posts";
+import { shareDue } from "@/lib/linkedin";
 import { dateTime, timeAgo } from "@/lib/format";
 
 const FILTERS = [
@@ -26,7 +27,11 @@ export default function Posts() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    fetchPosts().then(setPosts, () => setPosts([]));
+    fetchPosts().then((list) => {
+      setPosts(list);
+      /* scheduled posts reach LinkedIn when someone opens Posts after their time, or by the daily run */
+      if (dueForLinkedIn(list).length) shareDue().catch(() => {});
+    }, () => setPosts([]));
   }, []);
 
   if (!can(role, "content.read")) return <div className="notice">Your role does not include the blog.</div>;
