@@ -2,9 +2,12 @@
 /* Session, membership and toasts for every screen.
 
    status: "loading" | "signed-out" | "no-access" | "ready"
-   member: the signed-in user's row in studio_members (email, role, name) */
+   member: the signed-in user's row in studio_members (email, role, name),
+           or in client_members for a client login (role "client", client)
+   hostClient: the client whose portal address this is (e.g. cms.diptienterprise.com) */
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { CLIENTS, clientForHost } from "@/lib/clients";
 
 const Ctx = createContext(null);
 
@@ -17,6 +20,7 @@ export default function StudioProvider({ children }) {
   const [member, setMember] = useState(null);
   const [status, setStatus] = useState("loading");
   const [toasts, setToasts] = useState([]);
+  const [hostClient, setHostClient] = useState(null);
   const seq = useRef(0);
 
   const toast = useCallback((text, opts = {}) => {
@@ -32,16 +36,42 @@ export default function StudioProvider({ children }) {
       return;
     }
     const email = (s.user.email || "").toLowerCase();
-    const { data, error } = await supabase().from("studio_members").select("*").eq("email", email).maybeSingle();
-    if (error || !data) {
-      setMember(null);
-      setStatus("no-access");
+    const db = supabase();
+    const { data } = await db.from("studio_members").select("*").eq("email", email).maybeSingle();
+    if (data) {
+      setMember(data);
+      setStatus("ready");
+      db.rpc("studio_touch").then(() => {}, () => {});
       return;
     }
-    setMember(data);
-    setStatus("ready");
-    supabase().rpc("studio_touch").then(() => {}, () => {});
+    /* not agency staff: maybe a client login, limited to their own site */
+    const { data: cm } = await db.from("client_members").select("*").eq("email", email).maybeSingle();
+    if (cm && CLIENTS[cm.client]) {
+      setMember({ ...cm, role: "client" });
+      setStatus("ready");
+      db.rpc("client_touch").then(() => {}, () => {});
+      return;
+    }
+    setMember(null);
+    setStatus("no-access");
   }, []);
+
+  /* a client portal address wears that client's colours */
+  useEffect(() => {
+    const c = clientForHost(window.location.hostname);
+    setHostClient(c);
+  }, []);
+  const brandClient = member?.role === "client" ? member.client : hostClient;
+  useEffect(() => {
+    const a = brandClient && CLIENTS[brandClient]?.accent;
+    const st = document.documentElement.style;
+    if (a) {
+      st.setProperty("--o", a.o);
+      st.setProperty("--o-soft", a.soft);
+      st.setProperty("--o-deep", a.deep);
+      st.setProperty("--grad", "linear-gradient(135deg, " + a.soft + " 0%, " + a.o + " 100%)");
+    } else ["--o", "--o-soft", "--o-deep", "--grad"].forEach((k) => st.removeProperty(k));
+  }, [brandClient]);
 
   useEffect(() => {
     const db = supabase();
@@ -73,13 +103,16 @@ export default function StudioProvider({ children }) {
       session,
       member,
       role: member?.role || null,
+      client: member?.role === "client" ? member.client : null,
+      hostClient,
+      brandClient,
       email: session?.user?.email?.toLowerCase() || null,
       status,
       toast,
       signOut,
       refreshMember: () => loadMember(session),
     }),
-    [session, member, status, toast, signOut, loadMember],
+    [session, member, status, toast, signOut, loadMember, hostClient, brandClient],
   );
 
   return (

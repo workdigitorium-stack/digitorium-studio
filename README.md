@@ -40,13 +40,36 @@ The lead popup, cookie banner and contact form's own labels are not editable yet
 ## How it works
 
 - **Next.js 16**, all screens are client components talking to Supabase from the browser.
-- **No secrets.** The app only holds the publishable key. Every read and write is checked by
+- **No secrets in the browser.** The screens only hold the publishable key. (LinkedIn sharing is the one exception on the server: see below.) Every read and write is checked by
   row level security against `public.studio_members` (see `supabase/migrations/`).
 - **Sign-in** is Supabase Auth: a one-time email link, or a password once set.
   The login page cannot create accounts. An invite (from Team) is what creates one.
 - **The live site is untouched.** It already reads the same `videos` bucket and the same
   `leads` / `client_questionnaires` tables. Visitors still only insert.
 - **Installable** as a phone app (manifest + service worker). The service worker caches nothing.
+
+## Share blog posts on LinkedIn
+
+A post with **Share on LinkedIn when it goes live** ticked is posted once to one
+connected personal LinkedIn profile, as your text plus a link card (cover, title,
+summary) to `digitorium.in/blog/<slug>/`. Scheduled posts go out when someone opens
+Posts after their time, or by the daily run at 10:00 India time (`vercel.json`).
+The LinkedIn post is not changed if the blog post is edited later.
+
+The LinkedIn token lives in `public.linkedin_account`, which only the server can read
+(`app/api/linkedin`, `lib/linkedin-server.js`). Setup:
+
+1. On [developer.linkedin.com](https://developer.linkedin.com/) create an app (it needs a
+   LinkedIn company page to belong to). Under **Products** add **Sign In with LinkedIn
+   using OpenID Connect** and **Share on LinkedIn**. Both are instant.
+2. Under **Auth**, add the redirect URL `https://<studio domain>/api/linkedin/callback`.
+3. In Vercel → Settings → Environment Variables add `LINKEDIN_CLIENT_ID`,
+   `LINKEDIN_CLIENT_SECRET`, `SUPABASE_SECRET_KEY` (Supabase → Settings → API keys) and
+   `CRON_SECRET` (any long random text). Optional: `LINKEDIN_VERSION` (API version, `YYYYMM`).
+4. Redeploy, then an owner or admin opens **Account → LinkedIn → Connect LinkedIn**.
+
+LinkedIn connections last 60 days. Account shows the date and warns in the last week;
+Reconnect is one click.
 
 ## Roles
 

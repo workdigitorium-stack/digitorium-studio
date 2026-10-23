@@ -14,6 +14,7 @@ import { can } from "@/lib/roles";
 import { logActivity } from "@/lib/supabase";
 import { openPreview, SEO_LIMITS } from "@/lib/content";
 import { dateTime, timeAgo } from "@/lib/format";
+import { daysLeft, linkedinPostUrl, linkedinStatus, shareDue } from "@/lib/linkedin";
 import {
   BLANK,
   CATEGORIES,
@@ -42,6 +43,7 @@ export default function PostEditor({ id }) {
   const [state, setState] = useState("loading");
   const [busy, setBusy] = useState(false);
   const [sheet, setSheet] = useState(null); /* "schedule" | "history" */
+  const [li, setLi] = useState(undefined); /* the connected LinkedIn profile, or null */
 
   const docRef = useRef(null);
   const stamp = useRef(null);
@@ -71,6 +73,7 @@ export default function PostEditor({ id }) {
 
   useEffect(() => {
     load();
+    linkedinStatus().then(setLi, () => setLi(null));
     return () => clearTimeout(timer.current);
   }, [load]);
 
@@ -155,6 +158,7 @@ export default function PostEditor({ id }) {
       logActivity("post.publish", doc.title + (at ? " (scheduled " + dateTime(at.toISOString()) + ")" : ""));
       toast(at ? "Scheduled for " + dateTime(at.toISOString()) + "." : fresh ? "Published. It is on the site now." : "Published. It shows on the site within a minute.");
       setSheet(null);
+      if (!at && doc.linkedin?.share) await shareDue().catch(() => {});
       await load();
     } catch (e) {
       toast("Could not publish: " + e.message, { bad: true });
@@ -173,6 +177,18 @@ export default function PostEditor({ id }) {
       await load();
     } catch (e) {
       toast("Could not unpublish: " + e.message, { bad: true });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function retryLinkedIn() {
+    setBusy(true);
+    try {
+      await shareDue(id);
+      await load();
+    } catch (e) {
+      toast("Could not share: " + e.message, { bad: true });
     } finally {
       setBusy(false);
     }
@@ -315,6 +331,7 @@ export default function PostEditor({ id }) {
               Hide this post from Google
             </label>
           </section>
+          <LinkedInBox row={row} doc={doc} set={set} li={li} canEdit={canEdit} canPublish={canPublish} busy={busy} onRetry={retryLinkedIn} />
           {canPublish ? (
             <section className="card">
               <h2>Manage</h2>
@@ -336,6 +353,82 @@ export default function PostEditor({ id }) {
       {sheet === "schedule" ? <Schedule onClose={() => setSheet(null)} onPick={publish} busy={busy} current={status.key === "scheduled" ? row.publish_at : null} /> : null}
       {sheet === "history" ? <PostHistory id={id} canRestore={canPublish} onClose={() => setSheet(null)} onRestored={load} toast={toast} title={doc.title} /> : null}
     </div>
+  );
+}
+
+/* Share on LinkedIn: a tick and the post text, both kept in the draft, so
+   they go out with the version that is published. The server shares it
+   once the post is live (lib/linkedin-server.js). */
+function LinkedInBox({ row, doc, set, li, canEdit, canPublish, busy, onRetry }) {
+  const opt = doc.linkedin || {};
+  const setOpt = (patch) => set({ linkedin: { share: !!opt.share, text: opt.text || "", ...patch } });
+
+  if (row.linkedin_urn) {
+    return (
+      <section className="card">
+        <h2>LinkedIn</h2>
+        <p className="small">
+          Shared on {dateTime(row.linkedin_shared_at)}.{" "}
+          <a href={linkedinPostUrl(row.linkedin_urn)} target="_blank" rel="noreferrer">
+            View on LinkedIn
+          </a>
+        </p>
+        <p className="tiny muted">Changes to the post update the blog, not the LinkedIn post.</p>
+      </section>
+    );
+  }
+
+  const live = row.published && new Date(row.publish_at) <= new Date();
+  const liveShare = !!row.published?.linkedin?.share;
+  return (
+    <section className="card">
+      <h2>LinkedIn</h2>
+      <label className="check">
+        <input type="checkbox" checked={!!opt.share} disabled={!canEdit} onChange={(e) => setOpt({ share: e.target.checked })} />
+        Share on LinkedIn when it goes live
+      </label>
+      {opt.share ? (
+        <div className="field">
+          <span className="slotlabel">
+            Post text <span className="tiny muted">{(opt.text || "").length} / 2800</span>
+          </span>
+          <textarea
+            className="textarea"
+            style={{ minHeight: 110 }}
+            maxLength={2800}
+            placeholder={(doc.title + "\n\n" + doc.excerpt).trim() || "What you want to say about this post"}
+            value={opt.text || ""}
+            readOnly={!canEdit}
+            onChange={(e) => setOpt({ text: e.target.value })}
+          />
+          <span className="tiny muted">Empty uses the title and summary. A link card with the cover is added below the text.</span>
+        </div>
+      ) : null}
+      {opt.share && li === null ? (
+        <p className="notice notice--warn small">
+          LinkedIn is not connected yet. {canPublish ? <Link href="/account">Connect it under Account.</Link> : "Ask an owner or admin to connect it."}
+        </p>
+      ) : null}
+      {opt.share && li && daysLeft(li) < 0 ? (
+        <p className="notice notice--warn small">
+          The LinkedIn connection has expired. {canPublish ? <Link href="/account">Reconnect it under Account.</Link> : "Ask an owner or admin to reconnect it."}
+        </p>
+      ) : null}
+      {row.linkedin_error ? (
+        <div className="notice notice--bad small">
+          Not shared: {row.linkedin_error}{" "}
+          {canPublish ? (
+            <button className="linkbtn" onClick={onRetry} disabled={busy}>
+              Try again
+            </button>
+          ) : null}
+        </div>
+      ) : live && liveShare ? (
+        <p className="tiny muted">Sharing shortly.</p>
+      ) : opt.share && row.published && !liveShare ? (
+        <p className="tiny muted">Publish your changes to share it.</p>
+      ) : null}
+    </section>
   );
 }
 

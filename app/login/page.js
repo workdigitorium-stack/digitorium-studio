@@ -6,10 +6,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useStudio } from "@/components/StudioProvider";
+import { CLIENTS } from "@/lib/clients";
 
 export default function Login() {
   const router = useRouter();
-  const { status } = useStudio();
+  const { status, hostClient } = useStudio();
+  const info = hostClient ? CLIENTS[hostClient] : null;
   const [mode, setMode] = useState("link");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -57,20 +59,27 @@ export default function Login() {
   return (
     <main className="auth">
       <div className="authcard">
-        <div className="brand">
-          <img src="/icon-192.png" alt="" />
-          <span>
-            Digitorium <span className="grad-text">Studio</span>
-          </span>
-        </div>
+        {info ? (
+          <div className="brand">
+            <img src={info.logo} alt={info.name} style={{ width: "auto", height: 40, borderRadius: 0 }} />
+            <span className="pill">CMS</span>
+          </div>
+        ) : (
+          <div className="brand">
+            <img src="/icon-192.png" alt="" />
+            <span>
+              Digitorium <span className="grad-text">Studio</span>
+            </span>
+          </div>
+        )}
 
         {sent ? (
           <div className="authbox">
             <h1>Check your email</h1>
             <p className="muted">
-              If <b>{email.trim().toLowerCase()}</b> is on the Studio team, a sign-in link is on its way. Open it on this device.
+              If <b>{email.trim().toLowerCase()}</b> has access, a sign-in link is on its way. Open it on this device.
             </p>
-            <p className="small muted">No email after a few minutes? Check spam, or ask the owner to confirm your invite.</p>
+            <p className="small muted">No email after a few minutes? Check spam, or ask {info ? "Digitorium" : "the owner"} to confirm your invite.</p>
             <button className="linkbtn" onClick={() => setSent(false)}>
               Use a different email
             </button>
@@ -103,7 +112,7 @@ export default function Login() {
           </form>
         )}
         <p className="tiny muted" style={{ textAlign: "center" }}>
-          Private admin for digitorium.in. Access is by invitation only.
+          {info ? "Website editor for " + info.site.replace("https://", "") + ", by Digitorium." : "Private admin for digitorium.in."} Access is by invitation only.
         </p>
       </div>
     </main>

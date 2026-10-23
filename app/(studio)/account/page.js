@@ -7,9 +7,12 @@ import { useStudio } from "@/components/StudioProvider";
 import Icon from "@/components/Icon";
 import { supabase, SITE_URL } from "@/lib/supabase";
 import { can, ROLE_INFO } from "@/lib/roles";
+import { CLIENTS } from "@/lib/clients";
+import LinkedInCard from "@/components/LinkedInCard";
 
 export default function Account() {
-  const { member, email, role, signOut, toast, refreshMember } = useStudio();
+  const { member, email, role, signOut, toast, refreshMember, client } = useStudio();
+  const mine = client ? CLIENTS[client] : null;
   const [name, setName] = useState(member?.name || "");
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
@@ -83,17 +86,43 @@ export default function Account() {
               </Link>
             </>
           ) : null}
-          <Link href="/users" className="row">
-            <Icon name="users" size={18} />
-            <div className="grow">
-              <div className="title">Team</div>
-              <div className="sub">Who has access, and invites</div>
-            </div>
-          </Link>
-          <a href={SITE_URL} target="_blank" rel="noreferrer" className="row">
+          {mine ? (
+            <>
+              <Link href="/dipti/categories" className="row">
+                <Icon name="tag" size={18} />
+                <div className="grow">
+                  <div className="title">Categories</div>
+                  <div className="sub">Product groups and the menu</div>
+                </div>
+              </Link>
+              <Link href="/dipti/reviews" className="row">
+                <Icon name="star" size={18} />
+                <div className="grow">
+                  <div className="title">Reviews</div>
+                  <div className="sub">Google reviews shown on the site</div>
+                </div>
+              </Link>
+              <Link href="/dipti/settings" className="row">
+                <Icon name="settings" size={18} />
+                <div className="grow">
+                  <div className="title">Site details</div>
+                  <div className="sub">Phone, WhatsApp, address and page text</div>
+                </div>
+              </Link>
+            </>
+          ) : (
+            <Link href="/users" className="row">
+              <Icon name="users" size={18} />
+              <div className="grow">
+                <div className="title">Team</div>
+                <div className="sub">Who has access, and invites</div>
+              </div>
+            </Link>
+          )}
+          <a href={mine ? mine.site : SITE_URL} target="_blank" rel="noreferrer" className="row">
             <Icon name="external" size={18} />
             <div className="grow">
-              <div className="title">Open digitorium.in</div>
+              <div className="title">Open {(mine ? mine.site : SITE_URL).replace("https://", "")}</div>
               <div className="sub">The live site</div>
             </div>
           </a>
@@ -109,6 +138,8 @@ export default function Account() {
           </div>
         </form>
       ) : null}
+
+      {can(role, "content.publish") ? <LinkedInCard /> : null}
 
       <form className="card" onSubmit={savePassword}>
         <div>
