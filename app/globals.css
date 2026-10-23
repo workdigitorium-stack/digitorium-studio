@@ -40,6 +40,8 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: calc(var(--top-h) + var(--safe-t) + 12px); }
+/* nothing may widen a phone's page sideways (that also zooms the whole app out on iOS) */
+html, body { overflow-x: clip; }
 html.is-locked, html.is-locked body { overflow: hidden; overscroll-behavior: none; }
 body {
   background: var(--bg);
@@ -228,7 +230,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 
 /* ---------- page layout ---------- */
-.page { display: grid; gap: 20px; }
+.page { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); min-width: 0; }
 .pagehead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; }
 .pagehead p { color: var(--muted); font-size: 14px; margin-top: 4px; }
 .pagehead .actions { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -236,7 +238,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 @media (max-width: 699px) {
   .pagehead { align-items: stretch; }
   .pagehead > div:first-child { min-width: 0; }
-  .pagehead .actions { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 2px 16px; width: calc(100% + 32px); }
+  .pagehead .actions { flex: 1 1 100%; min-width: 0; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 2px 16px; }
   .pagehead .actions::-webkit-scrollbar { display: none; }
   h1 { font-size: 22px; }
 }
