@@ -236,15 +236,14 @@ export default function StudioLayout({ children }) {
 
       <nav className={"tabs" + (tucked && !menu ? " tucked" : "")} aria-label="Studio" style={{ gridTemplateColumns: "repeat(" + (tabs.length + 1) + ", 1fr)" }}>
         {tabs.map((n) => (
-          <Link key={n.href} href={n.href} className={"tab" + (isOn(n.href) ? " on" : "")} aria-current={isOn(n.href) ? "page" : undefined}>
-            <Icon name={n.icon} />
-            <span>{n.label}</span>
-            {n.href === "/leads" && newCount > 0 ? <span className="badge">{newCount}</span> : null}
+          <Link key={n.href} href={n.href} className={"tab" + (isOn(n.href) ? " on" : "")} aria-current={isOn(n.href) ? "page" : undefined} title={n.label}>
+            <Icon name={n.icon} solid={isOn(n.href)} />
+            <span className="sr">{n.label}</span>
+            {n.href === "/leads" && newCount > 0 ? <span className="badge">{newCount > 9 ? "9+" : newCount}</span> : null}
           </Link>
         ))}
-        <button className={"tab" + (menu ? " on" : "")} onClick={() => setMenu(true)} aria-label="Menu" aria-expanded={menu}>
-          <Icon name="menu" />
-          <span>Menu</span>
+        <button className={"tab" + (menu ? " on" : "")} onClick={() => setMenu(true)} aria-label="Menu" aria-expanded={menu} title="Menu">
+          <Icon name="menu" solid={menu} />
         </button>
       </nav>
 
