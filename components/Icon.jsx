@@ -43,6 +43,10 @@ const PATHS = {
   chair: "M7 3h10v8H7zM5 11h14v3H5zM8 14l-1 7M16 14l1 7M12 14v4M8 18h8",
   star: "M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z",
   tag: "M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9zM7.5 7.5h.01",
+  menu: "M4 7h16M4 12h16M4 17h16",
+  next: "M9 5l7 7-7 7",
+  select: "M4 4h16v16H4zM8 12l3 3 5-6",
+  linkedin: "M4 4h16v16H4zM8 10v6M8 7.5h.01M12 16v-6M12 13a2.5 2.5 0 0 1 5 0v3",
 };
 
 export default function Icon({ name, size, ...rest }) {

@@ -2,7 +2,8 @@
 /* One blog post: title, address, summary, cover, category, tags, the body
    (RichEditor) and its SEO. Every change autosaves to the draft. Owners and
    admins publish now or schedule a date, unpublish, restore an earlier
-   version or delete; editors write drafts. */
+   version or delete; editors write drafts. Previous / Next open the posts
+   either side, saving this one first; leaving any other way saves too. */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -22,6 +23,8 @@ import {
   slugify,
   postStatus,
   fetchPost,
+  fetchPosts,
+  cachedPosts,
   savePostDraft,
   publishPost,
   unpublishPost,
@@ -52,6 +55,9 @@ export default function PostEditor({ id }) {
   const conflict = useRef(false);
   /* the address follows the title until someone edits it, or it has been live */
   const slugTouched = useRef(false);
+  /* the draft as last saved, to tell whether anything is still unsaved */
+  const savedDoc = useRef(null);
+  const gone = useRef(false);
 
   const load = useCallback(async () => {
     clearTimeout(timer.current);
@@ -62,6 +68,7 @@ export default function PostEditor({ id }) {
       setRow(r);
       setDoc(d);
       docRef.current = d;
+      savedDoc.current = d;
       stamp.current = r.draft_updated_at;
       conflict.current = false;
       slugTouched.current = !!r.slug || (!!d.slug && d.slug !== slugify(d.title));
@@ -90,6 +97,7 @@ export default function PostEditor({ id }) {
         return;
       }
       stamp.current = res.draft_updated_at;
+      savedDoc.current = sent;
       setRow((r) => ({ ...r, draft: sent, ...res }));
       if (docRef.current === sent) setState("saved");
       else {
@@ -99,7 +107,7 @@ export default function PostEditor({ id }) {
     } catch (e) {
       setState("dirty");
       toast("Could not save: " + (e.message || "check your connection") + ". Trying again shortly.", { bad: true });
-      timer.current = setTimeout(save, SAVE_DELAY * 5);
+      if (!gone.current) timer.current = setTimeout(save, SAVE_DELAY * 5);
     } finally {
       saving.current = false;
     }
@@ -116,6 +124,27 @@ export default function PostEditor({ id }) {
       timer.current = setTimeout(save, SAVE_DELAY);
     },
     [save],
+  );
+
+  /* saves whatever is waiting now, and resolves once it is saved; false if it could not be */
+  const flush = useCallback(async () => {
+    clearTimeout(timer.current);
+    while (saving.current) await new Promise((r) => setTimeout(r, 80));
+    if (!conflict.current && docRef.current !== savedDoc.current) await save();
+    clearTimeout(timer.current);
+    return conflict.current || docRef.current === savedDoc.current;
+  }, [save]);
+
+  /* leaving by Back, the menu or a tab still saves the last few keystrokes */
+  const saveRef = useRef(save);
+  saveRef.current = save;
+  useEffect(
+    () => () => {
+      gone.current = true;
+      clearTimeout(timer.current);
+      if (!conflict.current && !saving.current && docRef.current && docRef.current !== savedDoc.current) saveRef.current();
+    },
+    [],
   );
 
   useEffect(() => {
@@ -260,7 +289,10 @@ export default function PostEditor({ id }) {
       {!ready && canPublish ? <div className="notice">Give the post a title and a web address to publish it.</div> : null}
 
       <div className="postgrid">
-        <div className="page" style={{ gap: 14 }}>
+        <div className="postgrid__li">
+          <LinkedInBox row={row} doc={doc} set={set} li={li} canEdit={canEdit} canPublish={canPublish} busy={busy} onRetry={retryLinkedIn} />
+        </div>
+        <div className="page postgrid__main" style={{ gap: 14 }}>
           <input
             className="posttitle"
             placeholder="Post title"
@@ -297,6 +329,7 @@ export default function PostEditor({ id }) {
             <textarea className="textarea" style={{ minHeight: 70 }} maxLength={220} placeholder="One or two lines under the title, and on the blog page." value={doc.excerpt} readOnly={!canEdit} onChange={(e) => set({ excerpt: e.target.value })} />
           </div>
           <RichEditor value={doc.body} onChange={(body) => set({ body })} readOnly={!canEdit} toast={toast} />
+          <PostNav id={id} flush={flush} title={doc.title} />
         </div>
 
         <aside className="page" style={{ gap: 14 }}>
@@ -331,7 +364,6 @@ export default function PostEditor({ id }) {
               Hide this post from Google
             </label>
           </section>
-          <LinkedInBox row={row} doc={doc} set={set} li={li} canEdit={canEdit} canPublish={canPublish} busy={busy} onRetry={retryLinkedIn} />
           {canPublish ? (
             <section className="card">
               <h2>Manage</h2>
@@ -572,5 +604,45 @@ function PostHistory({ id, canRestore, onClose, onRestored, toast, title }) {
         )}
       </div>
     </div>
+  );
+}
+
+/* Previous and next post, in the order Posts lists them. Saves this one
+   first, so moving on never loses a change. */
+function PostNav({ id, flush, title }) {
+  const router = useRouter();
+  const [list, setList] = useState(cachedPosts);
+  const [going, setGoing] = useState(null);
+  useEffect(() => {
+    if (!cachedPosts()) fetchPosts().then(setList, () => {});
+  }, []);
+  const i = (list || []).findIndex((p) => p.id === id);
+  if (!list || i < 0) return null;
+  const prev = list[i - 1];
+  const next = list[i + 1];
+  if (!prev && !next) return null;
+
+  async function go(p) {
+    setGoing(p.id);
+    const ok = await flush();
+    if (!ok && !confirm("“" + (title || "This post") + "” has a change that could not be saved yet. Leave anyway?")) return setGoing(null);
+    router.push("/posts/" + p.id);
+  }
+
+  const card = (p, dir) => (
+    <button type="button" className={dir === "next" ? "is-next" : ""} onClick={() => go(p)} disabled={!!going}>
+      {dir === "prev" ? <Icon name="back" /> : null}
+      <span className="grow">
+        <span>{going === p.id ? "Saving…" : dir === "prev" ? "Previous" : "Next"}</span>
+        <b>{p.draft?.title || "Untitled"}</b>
+      </span>
+      {dir === "next" ? <Icon name="next" /> : null}
+    </button>
+  );
+  return (
+    <nav className="postnav" aria-label="Other posts">
+      {prev ? card(prev, "prev") : null}
+      {next ? card(next, "next") : null}
+    </nav>
   );
 }

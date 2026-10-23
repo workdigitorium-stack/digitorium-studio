@@ -1,46 +1,23 @@
 "use client";
-/* The signed-in frame around every Studio screen: sidebar on desktop,
-   tab bar on a phone. It also listens for new leads while the Studio is
+/* The signed-in frame around every Studio screen: sidebar on desktop, a
+   top bar with back and the menu everywhere, and a bottom tab bar on a
+   phone or tablet that tucks away while you scroll down. It also listens for new leads while the Studio is
    open, shows a toast (and a system notification if allowed), and tells
    any open screen through a "studio:lead" window event. */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useStudio } from "@/components/StudioProvider";
 import Icon from "@/components/Icon";
+import AppMenu from "@/components/AppMenu";
+import useScrollMemory, { canGoBack } from "@/components/useScrollMemory";
 import { supabase } from "@/lib/supabase";
 import { can, canEditClient, ROLE_INFO } from "@/lib/roles";
 import { CLIENTS } from "@/lib/clients";
-
-const NAV = [
-  { href: "/", label: "Dashboard", icon: "home" },
-  { href: "/leads", label: "Leads", icon: "leads", need: "leads.read" },
-  { href: "/media", label: "Media", icon: "media", need: "media.read" },
-  { href: "/pages", label: "Pages", icon: "pages", need: "content.read" },
-  { href: "/posts", label: "Posts", icon: "posts", need: "content.read" },
-  { href: "/brand", label: "Brand", icon: "brand", need: "content.read" },
-  { href: "/seo", label: "SEO", icon: "seo", need: "content.read" },
-  { href: "/users", label: "Team", icon: "users" },
-  { href: "/account", label: "Account", icon: "account" },
-];
-
-/* A client's own screens. Staff see them under that client's name in the
-   sidebar; a client login sees only these. */
-const CLIENT_NAV = {
-  "dipti-enterprise": [
-    { href: "/dipti", label: "Overview", icon: "home", exact: true },
-    { href: "/dipti/products", label: "Products", icon: "chair" },
-    { href: "/dipti/categories", label: "Categories", icon: "tag" },
-    { href: "/dipti/gallery", label: "Gallery", icon: "photo" },
-    { href: "/dipti/reviews", label: "Reviews", icon: "star" },
-    { href: "/dipti/settings", label: "Site details", icon: "settings" },
-  ],
-};
+import { NAV, CLIENT_NAV, TAB_ORDER, isOn as onPath, screenFor, parentOf } from "@/lib/nav";
 
 /* Later phases of the plan, shown so the team knows what is coming. */
 const SOON = [];
-
-const CLIENT_NAV_EXACT = new Set(Object.values(CLIENT_NAV).flatMap((g) => g.filter((n) => n.exact).map((n) => n.href)));
 
 function Brand({ info }) {
   return (
@@ -65,6 +42,28 @@ export default function StudioLayout({ children }) {
   const router = useRouter();
   const path = usePathname();
   const [newCount, setNewCount] = useState(0);
+  const [menu, setMenu] = useState(false);
+  const [tucked, setTucked] = useState(false);
+  const closeMenu = useCallback(() => setMenu(false), []);
+  useScrollMemory(path);
+
+  /* the bottom bar slides away while scrolling down a long screen, back on the way up */
+  const lastY = useRef(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      const dy = y - lastY.current;
+      if (Math.abs(dy) < 6) return;
+      setTucked(dy > 0 && y > 120);
+      lastY.current = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  useEffect(() => {
+    setTucked(false);
+    setMenu(false);
+  }, [path]);
 
   useEffect(() => {
     if (status === "signed-out") router.replace("/login");
@@ -156,14 +155,18 @@ export default function StudioLayout({ children }) {
       ? clientNav.flatMap((g) => g.items).concat({ href: "/account", label: "Account", icon: "account" })
       : NAV.filter((n) => !n.need || can(role, n.need));
   const groups = role === "client" ? [] : clientNav;
-  const isOn = (href) => (href === "/" ? path === "/" : CLIENT_NAV_EXACT.has(href) ? path === href : path.startsWith(href));
-  const tabs =
+  const isOn = (href) => onPath(path, href);
+  const tabSource =
     role === "client" || (brandClient && groups.length)
-      ? (role === "client" ? nav : groups.find((g) => g.client === brandClient)?.items || nav)
-          .filter((n) => n.href !== "/account" && n.href !== "/dipti/categories" && n.href !== "/dipti/reviews")
-          .slice(0, 4)
-          .concat({ href: "/account", label: "More", icon: "more" })
-      : nav.filter((n) => n.href !== "/account").slice(0, 4).concat({ href: "/account", label: "More", icon: "more" });
+      ? (role === "client" ? nav : groups.find((g) => g.client === brandClient)?.items || nav).filter(
+          (n) => n.href !== "/account" && n.href !== "/dipti/categories" && n.href !== "/dipti/reviews",
+        )
+      : TAB_ORDER.map((h) => nav.find((n) => n.href === h)).filter(Boolean);
+  const tabs = tabSource.slice(0, 4).map((n) => ({ ...n, label: n.href === "/" ? "Home" : n.label }));
+  const screen = screenFor(path);
+  const home = brandClient && CLIENTS[brandClient] ? CLIENTS[brandClient].home : "/";
+  const showBack = path !== home;
+  const goBack = () => (canGoBack() ? router.back() : router.push(screen.top ? home : parentOf(path)));
   const brandInfo = brandClient ? CLIENTS[brandClient] : null;
   const viewSite = brandInfo ? brandInfo.site : "https://digitorium.in";
 
@@ -205,24 +208,47 @@ export default function StudioLayout({ children }) {
         </div>
       </aside>
 
-      <header className="topbar">
-        <Brand info={brandInfo} />
-        <a href={viewSite} target="_blank" rel="noreferrer" className="btn btn--sm">
-          View site <Icon name="external" />
-        </a>
-      </header>
+      <div className="col">
+        <header className="topbar">
+          {showBack ? (
+            <button className="btn btn--icon btn--ghost" aria-label="Back" onClick={goBack}>
+              <Icon name="back" />
+            </button>
+          ) : (
+            <span className="topbar__brand">
+              <Brand info={brandInfo} />
+            </span>
+          )}
+          <h1 className={"topbar__title" + (showBack ? "" : " topbar__title--desk")}>{screen.title}</h1>
+          <div className="topbar__end">
+            <a href={viewSite} target="_blank" rel="noreferrer" className="btn btn--sm topbar__site">
+              View site <Icon name="external" />
+            </a>
+            <button className="btn btn--icon btn--ghost" aria-label="Open menu" aria-expanded={menu} onClick={() => setMenu(true)}>
+              <Icon name="menu" />
+              {newCount > 0 && can(role, "leads.read") ? <span className="dot" /> : null}
+            </button>
+          </div>
+        </header>
 
-      <main className="main">{children}</main>
+        <main className="main">{children}</main>
+      </div>
 
-      <nav className="tabs" aria-label="Studio" style={{ gridTemplateColumns: "repeat(" + tabs.length + ", 1fr)" }}>
+      <nav className={"tabs" + (tucked && !menu ? " tucked" : "")} aria-label="Studio" style={{ gridTemplateColumns: "repeat(" + (tabs.length + 1) + ", 1fr)" }}>
         {tabs.map((n) => (
-          <Link key={n.label} href={n.href} className={"tab" + (isOn(n.href) ? " on" : "")}>
+          <Link key={n.href} href={n.href} className={"tab" + (isOn(n.href) ? " on" : "")} aria-current={isOn(n.href) ? "page" : undefined}>
             <Icon name={n.icon} />
-            {n.label}
+            <span>{n.label}</span>
             {n.href === "/leads" && newCount > 0 ? <span className="badge">{newCount}</span> : null}
           </Link>
         ))}
+        <button className={"tab" + (menu ? " on" : "")} onClick={() => setMenu(true)} aria-label="Menu" aria-expanded={menu}>
+          <Icon name="menu" />
+          <span>Menu</span>
+        </button>
       </nav>
+
+      <AppMenu open={menu} onClose={closeMenu} path={path} nav={nav} groups={groups} newCount={can(role, "leads.read") ? newCount : 0} viewSite={viewSite} />
     </div>
   );
 }
