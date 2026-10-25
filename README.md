@@ -1,6 +1,6 @@
 # Digitorium Studio
 
-The admin app for [digitorium.in](https://digitorium.in). The full plan is in
+The admin app for [digitorium.in](https://www.digitorium.in). The full plan is in
 [`docs/studio-plan.html`](docs/studio-plan.html). This repo holds **phase 1** and
 **phase 2** (every page of the site, and Brand) and **phase 3** (SEO and the blog):
 
@@ -12,7 +12,7 @@ The admin app for [digitorium.in](https://digitorium.in). The full plan is in
 | Pages → Home | Every word on the home page, section by section. Hide a section, add, remove and reorder clients, case studies, industries and questions. |
 | Pages → every other page | Services and the six service pages, Work and the six case studies, About, Contact, Privacy Policy, Terms. Every text, picture and link, in page order under its heading, with search, "Only changed" and Reset to original. |
 | Brand | Logo, phone, WhatsApp and email, the header's Services and Work menus, and the footer. Shows on every page. |
-| Posts | The blog at digitorium.in/blog/. Write with a toolbar (headings, bold, lists, links, quotes, pictures), cover, summary, category, tags and per-post SEO. Publish now or schedule a date; unpublish, history and restore, delete. |
+| Posts | The blog at www.digitorium.in/blog. Write with a toolbar (headings, bold, lists, links, quotes, pictures), cover, summary, category, tags and per-post SEO. Publish now or schedule a date; unpublish, history and restore, delete. |
 | SEO | For every page: title and description in Google (with a preview and length check), share picture, hide from Google, canonical. Redirects from old addresses. |
 | Team | Invite by email with Owner, Admin, Editor or Viewer roles. Change roles, remove people. |
 | Account | Set a password, sign out, install on phone. |
@@ -52,7 +52,7 @@ The lead popup, cookie banner and contact form's own labels are not editable yet
 
 A post with **Share on LinkedIn when it goes live** ticked is posted once to one
 connected personal LinkedIn profile, as your text plus a link card (cover, title,
-summary) to `digitorium.in/blog/<slug>/`. Scheduled posts go out when someone opens
+summary) to `www.digitorium.in/blog/<slug>`. Scheduled posts go out when someone opens
 Posts after their time, or by the daily run at 10:00 India time (`vercel.json`).
 The LinkedIn post is not changed if the blog post is edited later.
 

@@ -177,7 +177,7 @@ export default function PostEditor({ id }) {
   const status = postStatus(row);
   const slugBad = doc.slug && !SLUG_OK.test(doc.slug);
   const ready = doc.title.trim() && doc.slug && !slugBad;
-  const path = "/blog/" + (doc.slug || "…") + "/";
+  const path = "/blog/" + (doc.slug || "…");
 
   async function publish(at) {
     if (!at && !confirm(status.key === "draft" ? "Publish “" + doc.title + "” on digitorium.in now?" : "Publish your changes to “" + doc.title + "”?")) return;

@@ -11,7 +11,7 @@ import { useStudio } from "@/components/StudioProvider";
 import Icon from "@/components/Icon";
 import AppMenu from "@/components/AppMenu";
 import useScrollMemory, { canGoBack } from "@/components/useScrollMemory";
-import { supabase } from "@/lib/supabase";
+import { supabase, SITE_URL } from "@/lib/supabase";
 import { can, canEditClient, ROLE_INFO } from "@/lib/roles";
 import { CLIENTS } from "@/lib/clients";
 import { NAV, CLIENT_NAV, TAB_ORDER, isOn as onPath, screenFor, parentOf } from "@/lib/nav";
@@ -168,7 +168,7 @@ export default function StudioLayout({ children }) {
   const showBack = path !== home;
   const goBack = () => (canGoBack() ? router.back() : router.push(screen.top ? home : parentOf(path)));
   const brandInfo = brandClient ? CLIENTS[brandClient] : null;
-  const viewSite = brandInfo ? brandInfo.site : "https://digitorium.in";
+  const viewSite = brandInfo ? brandInfo.site : SITE_URL;
 
   return (
     <div className="shell">

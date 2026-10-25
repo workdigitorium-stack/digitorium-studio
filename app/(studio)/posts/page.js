@@ -133,7 +133,7 @@ export default function Posts() {
               <Icon name={picking ? "close" : "select"} /> {picking ? "Done" : "Select"}
             </button>
           ) : null}
-          <a className="btn" href={SITE_URL + "/blog/"} target="_blank" rel="noreferrer">
+          <a className="btn" href={SITE_URL + "/blog"} target="_blank" rel="noreferrer">
             Open the blog <Icon name="external" />
           </a>
         </div>
