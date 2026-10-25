@@ -52,8 +52,11 @@ The lead popup, cookie banner and contact form's own labels are not editable yet
 
 A post with **Share on LinkedIn when it goes live** ticked is posted once to one
 connected personal LinkedIn profile, as your text plus a link card (cover, title,
-summary) to `www.digitorium.in/blog/<slug>`. Scheduled posts go out when someone opens
-Posts after their time, or by the daily run at 10:00 India time (`vercel.json`).
+summary) to `www.digitorium.in/blog/<slug>`. Scheduled posts go out within a minute of
+their time: the database checks every minute (`pg_cron`, see
+`supabase/migrations/20261025150000_linkedin_share_every_minute.sql`) and calls the share
+run when one is due. Opening Posts and the daily run at 10:00 India time (`vercel.json`)
+still catch anything missed.
 The LinkedIn post is not changed if the blog post is edited later.
 
 The LinkedIn token lives in `public.linkedin_account`, which only the server can read
@@ -67,6 +70,12 @@ The LinkedIn token lives in `public.linkedin_account`, which only the server can
    `LINKEDIN_CLIENT_SECRET`, `SUPABASE_SECRET_KEY` (Supabase → Settings → API keys) and
    `CRON_SECRET` (any long random text). Optional: `LINKEDIN_VERSION` (API version, `YYYYMM`).
 4. Redeploy, then an owner or admin opens **Account → LinkedIn → Connect LinkedIn**.
+5. So scheduled posts go out on time, in Supabase → SQL editor run once (same
+   `CRON_SECRET` as in Vercel):
+   ```sql
+   select vault.create_secret('https://<studio domain>', 'studio_url');
+   select vault.create_secret('<CRON_SECRET>', 'studio_cron_secret');
+   ```
 
 LinkedIn connections last 60 days. Account shows the date and warns in the last week;
 Reconnect is one click.

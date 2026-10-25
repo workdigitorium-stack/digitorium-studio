@@ -45,7 +45,7 @@ export default function Posts() {
     setFilterState(savedFilter());
     fetchPosts().then((list) => {
       setPosts(list);
-      /* scheduled posts reach LinkedIn when someone opens Posts after their time, or by the daily run */
+      /* the database shares scheduled posts every minute; this catches any it missed */
       if (dueForLinkedIn(list).length) shareDue().catch(() => {});
     }, () => setPosts((p) => p || []));
   }, []);

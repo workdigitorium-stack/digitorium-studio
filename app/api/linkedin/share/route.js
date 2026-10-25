@@ -2,7 +2,8 @@
    POST: from the Studio (any member) after a publish, or when Posts opens,
    so scheduled posts go out soon after their time. { retry: <post id> }
    from an owner or admin first clears that post's last error.
-   GET: Vercel's daily cron (vercel.json), in case nobody opens the Studio. */
+   GET: the database's every-minute check (pg_cron, when a post is due) and
+   Vercel's daily cron (vercel.json), so nobody has to open the Studio. */
 import { NextResponse } from "next/server";
 import { clearError, configured, memberFrom, shareDue } from "@/lib/linkedin-server";
 
