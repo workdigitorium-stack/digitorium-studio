@@ -394,7 +394,7 @@ function SeoForm({ def, doc, change, readOnly, toast }) {
                   </label>
                   <div className="field">
                     <span>Canonical address (advanced)</span>
-                    <input className="input" value={o.canonical || ""} placeholder={p.path} readOnly={readOnly} onChange={(e) => setField(p.path, "canonical", e.target.value)} />
+                    <input className="input" value={o.canonical || ""} placeholder={"https://www.digitorium.in" + (p.path === "/" ? "" : p.path.replace(/\/$/, ""))} readOnly={readOnly} onChange={(e) => setField(p.path, "canonical", e.target.value)} />
                     <span className="tiny muted">Only if this page copies another one: the address Google should rank instead.</span>
                   </div>
                 </div>
@@ -466,7 +466,7 @@ export function SeoPreview({ path, title, description, image }) {
           <span>
             <b>Digitorium</b>
             <br />
-            <span className="muted">https://digitorium.in{path !== "/" ? " › " + path.replace(/^\/|\/$/g, "").split("/").join(" › ") : ""}</span>
+            <span className="muted">https://www.digitorium.in{path !== "/" ? " › " + path.replace(/^\/|\/$/g, "").split("/").join(" › ") : ""}</span>
           </span>
         </div>
         <div className="serp__title">{cut(title, 62)}</div>
